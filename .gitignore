@@ -24,11 +24,3 @@
 
 # Ci Files
 !.travis.yml
-.gitignore
-build.gradle
-gradle.properties
-gradle/
-gradlew
-gradlew.bat
-libs/
-src/

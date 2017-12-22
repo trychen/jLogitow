@@ -1,0 +1,15 @@
+[
+{
+  "modid": "logitow",
+  "name": "LogiTow",
+  "description": "An api for LogiTow Cube.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Trychen"],
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

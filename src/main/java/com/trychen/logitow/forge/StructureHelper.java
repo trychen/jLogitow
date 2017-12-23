@@ -5,38 +5,55 @@ import com.trychen.logitow.stack.Facing;
 import com.trychen.logitow.stack.Structure;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface StructureHelper {
-    static void check(Structure structure, TileEntity tileEntity, BlockPos pos) {
-        int direction = 3;
+    static void check(Structure structure, World world, BlockPos pos, Collection<BlockPos> useCheck) {
+        int direction = 4;
         if (structure.getColor() == Color.CORE) {
+            useCheck.add(pos);
             Structure[] children = structure.getChildren();
             Structure upStructure = children[Facing.UP.id];
-            World world = tileEntity.getWorld();
             BlockPos upPos = transformPos(pos, direction, 1, 0, 0);
-            IBlockState blockState = world.getBlockState(upPos);
-            if (blockState.getBlock() == Blocks.WOOL && upStructure == null) world.setBlockToAir(upPos);
-            else if (blockState.getBlock() == Blocks.AIR && upStructure != null) {
-                if (blockState.getBlock() != Blocks.WOOL) {
-                    world.setBlockState(upPos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, transformToEnumDyeColor(upStructure.getColor())));
-                } else if (blockState.getBlock() != Blocks.WOOL && transformToColor(blockState.getValue(BlockColored.COLOR)) != upStructure.getColor()) {
-                    world.setBlockState(upPos, blockState.withProperty(BlockColored.COLOR, transformToEnumDyeColor(upStructure.getColor())));
+
+                update(world, upPos, upStructure, useCheck);
+                if (upStructure != null)
+                    for (Structure child : upStructure.getChildren())
+                        if (child != null) check(upStructure, world, upPos, useCheck);
+        } else {
+            if ((structure.getFacing() == Facing.UP && structure.getParent().getColor() == Color.CORE)
+                    || structure.getFacing() == Facing.FRONT) {
+                for (Structure child : structure.getChildren()) {
+                    if (child == null) continue;
+                    if (child.getFacing() != Facing.FRONT) continue;
+                    BlockPos tranPos = transformPos(pos, direction, child.getFacing());
+                    update(world, tranPos, child, useCheck);
+                    check(child, world, tranPos, useCheck);
                 }
             }
-            if (upStructure != null)
-                for (Structure child : upStructure.getChildren())
-                    if (child != null) check(structure, tileEntity, upPos);
-        } else {
-            if (structure.getFacing() == Facing.UP) {
-                Structure up = structure.getChildren(Facing.FRONT);
+        }
+    }
 
+    static void update(World world, BlockPos pos, Structure aimStructure, Collection<BlockPos> useCheck) {
+        if (useCheck.contains(pos)) return;
+        IBlockState blockState = world.getBlockState(pos);
+        if (blockState.getBlock() == Blocks.AIR && aimStructure != null) {
+            if (blockState.getBlock() != Blocks.WOOL) {
+                world.setBlockState(pos, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, transformToEnumDyeColor(aimStructure.getColor())));
+            } else if (blockState.getBlock() != Blocks.WOOL && transformToColor(blockState.getValue(BlockColored.COLOR)) != aimStructure.getColor()) {
+                world.setBlockState(pos, blockState.withProperty(BlockColored.COLOR, transformToEnumDyeColor(aimStructure.getColor())));
             }
+            useCheck.add(pos);
+        } else if (aimStructure != null && blockState.getBlock() == Blocks.WOOL) {
+            useCheck.add(pos);
         }
     }
 
@@ -100,5 +117,11 @@ public interface StructureHelper {
         if (direction == EnumFacing.WEST.getIndex()) return pos.add(-x, y, z);
         if (direction == EnumFacing.EAST.getIndex()) return pos.add(x, y, z);
         return pos.add(x, y, z);
+    }
+
+    static BlockPos transformPos(BlockPos pos, int direction, Facing facing) {
+        if (facing == Facing.FRONT) return transformPos(pos, direction, 1, 0, 0);
+
+        return pos;
     }
 }

@@ -24,3 +24,6 @@
 
 # Ci Files
 !.travis.yml
+
+# Native Lib
+!native/

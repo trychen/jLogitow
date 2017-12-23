@@ -1,12 +1,15 @@
 package com.trychen.logitow.stack;
 
+import scala.actors.threadpool.Arrays;
+
 public class Structure {
     private int blockID;
     private Structure parent;
     private Color color;
+    private Facing facing = Facing.UNKNOWN;
 
     private Structure[] children = new Structure[6];
-    private Facing facing = Facing.UNKNOWN;
+    private Structure removedStructure;
 
     public Structure(int blockID, Structure parent, Facing facing) {
         this.blockID = blockID;
@@ -43,6 +46,7 @@ public class Structure {
     }
 
     private void removeChild(Facing facing) {
+        removedStructure = getChildren(facing);
         getChildren()[facing.id] = null;
     }
 
@@ -72,6 +76,17 @@ public class Structure {
         return color;
     }
 
+    public Structure getParent() {
+        return parent;
+    }
+
+    public Structure getRemovedStructure() {
+        return removedStructure;
+    }
+
+    public void setRemovedStructure(Structure removedStructure) {
+        this.removedStructure = removedStructure;
+    }
 
     /**
      * 只删除当前 Structure 的子方块
@@ -90,5 +105,13 @@ public class Structure {
     @Override
     public int hashCode() {
         return Integer.hashCode(blockID);
+    }
+
+    public Structure copy() {
+        Structure structure = new Structure(blockID, parent, facing);
+        for (int i = 0; i < children.length; i++) {
+            structure.children[i] = children[i].copy();
+        }
+        return structure;
     }
 }

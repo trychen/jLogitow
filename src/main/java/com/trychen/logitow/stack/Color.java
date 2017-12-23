@@ -1,7 +1,7 @@
 package com.trychen.logitow.stack;
 
 public enum Color {
-    CORE(1, 1),
+    CORE(0, 0),
     WHITE(1048576, 2097151),
     BLACK(2097152,3145727),
     RED(3145728, 4194303),

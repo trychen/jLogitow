@@ -1,7 +1,24 @@
 package com.trychen.logitow.stack;
 
 public enum Facing {
-    FRONT, BACK, UP, DOWN, RIGHT, LEFT;
+    BACK(1), // 针脚
+    FRONT(2), // 针脚对面
+    UP(3),
+    LEFT(4),
+    DOWN(5),
+    RIGHT(6),
+    UNKNOWN(-1);
 
-    private int id;
+    public final int id;
+
+    Facing(int id) {
+        this.id = id;
+    }
+
+    public static Facing getFacing(int id){
+        for (Facing facing : values()) {
+            if (facing.id == id) return facing;
+        }
+        return Facing.UNKNOWN;
+    }
 }

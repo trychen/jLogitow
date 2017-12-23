@@ -1,5 +1,7 @@
 package com.trychen.logitow.stack;
 
+import java.util.Arrays;
+
 public class BlockData {
     /**
      * block which is inserted
@@ -26,6 +28,10 @@ public class BlockData {
         return Color.getColor(newBlockID);
     }
 
+    public Facing getFacing(){
+        return Facing.getFacing(insertFace);
+    }
+
     public Color getInsertBlockColor(){
         return Color.getColor(insertBlockID);
     }
@@ -41,6 +47,11 @@ public class BlockData {
 
     @Override
     public String toString() {
-        return String.format("BlockData{NewBlockID: %s, NewBlockColor: %s, InsertBlockID: %s, InsertFace: %s}", newBlockID, getNewBlockColor().name(), insertBlockID, insertFace);
+        return String.format("BlockData{NewBlockID: %s, NewBlockColor: %s, InsertBlockID: %s, InsertFace: %s}", newBlockID, getNewBlockColor().name(), insertBlockID, getFacing());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new int[]{insertBlockID, insertFace, newBlockID});
     }
 }

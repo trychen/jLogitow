@@ -11,6 +11,9 @@ import javax.annotation.Nullable;
 public class LogitowBlock extends Block {
     public LogitowBlock() {
         super(Material.IRON);
+        setRegistryName("logitow:core_block");
+        setUnlocalizedName("core_block");
+        setHardness(2f);
     }
 
     @Override
@@ -18,4 +21,9 @@ public class LogitowBlock extends Block {
         return true;
     }
 
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        return new TileEntityLogitow();
+    }
 }

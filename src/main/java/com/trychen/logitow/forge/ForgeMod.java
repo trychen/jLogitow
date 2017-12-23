@@ -17,9 +17,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Mod(modid = ForgeMod.MODID, version = ForgeMod.VERSION)
@@ -45,7 +43,8 @@ public class ForgeMod {
     }
 
     private Structure structure = new Structure(0, null, Facing.BACK);
-    private Set<BlockPos> lastUse;
+    private Set<BlockPos> lastUse = new HashSet<>();
+
     @SubscribeEvent
     public void data(LogitowBlockDataEvent event) {
         if (Minecraft.getMinecraft().world == null) return;
@@ -54,14 +53,15 @@ public class ForgeMod {
                 Set<BlockPos> useCheck = new HashSet<>();
                 structure.insert(event.getBlockData());
                 StructureHelper.check(structure, tileentity.getWorld(), tileentity.getPos(), useCheck);
-                if (lastUse != null) {
+                if (event.getBlockData().newBlockID == 0 && lastUse != null) {
                     lastUse.removeAll(useCheck);
                     for (BlockPos blockPos : lastUse) {
                         if (tileentity.getWorld().getBlockState(blockPos).getBlock() == Blocks.WOOL) tileentity.getWorld().setBlockToAir(blockPos);
                     }
+                    lastUse.clear();
+                } else {
+                    lastUse.addAll(useCheck);
                 }
-                lastUse = useCheck;
-                System.out.println(tileentity.getBlockMetadata());
             });
         });
     }

@@ -1,7 +1,5 @@
 package com.trychen.logitow.stack;
 
-import scala.actors.threadpool.Arrays;
-
 public class Structure {
     private int blockID;
     private Structure parent;
@@ -47,7 +45,7 @@ public class Structure {
 
     private void removeChild(Facing facing) {
         removedStructure = getChildren(facing);
-        getChildren()[facing.id] = null;
+        getChildren()[facing.id - 1] = null;
     }
 
     private void clear(){
@@ -59,7 +57,7 @@ public class Structure {
     }
 
     public Structure getChildren(Facing face) {
-        return getChildren()[face.id];
+        return getChildren()[face.id - 1];
     }
 
     public Facing getFacing() {
@@ -68,9 +66,13 @@ public class Structure {
 
     private void addChild(Facing facing, Structure structure){
         if (facing == Facing.UNKNOWN) throw new IllegalArgumentException();
-        children[facing.id] = structure;
+        children[facing.id - 1] = structure;
     }
 
+    public Structure getFinalStructure() {
+        if (getParent().getFacing() != getParent().getParent().getFacing()) return this;
+        return getParent().getFinalStructure();
+    }
 
     public Color getColor(){
         return color;

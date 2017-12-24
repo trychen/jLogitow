@@ -1,4 +1,4 @@
-# jLogitow
+# jLogitow [![Build Status](https://travis-ci.org/trychen/jLogitow.svg?branch=master)](https://travis-ci.org/trychen/jLogitow) [![](https://www.jitpack.io/v/trychen/jLogitow.svg)](https://www.jitpack.io/#trychen/jLogitow)
 A java library and a forge mod help program connect and communicate to Logitow Device
 
 ## Usage
@@ -26,7 +26,7 @@ For Maven, add this in `pom.xml`:
 <dependency>
     <groupId>com.github.trychen</groupId>
     <artifactId>jLogitow</artifactId>
-    <version>1.0</version>
+    <version>1.0-BETA</version>
 </dependency>
 ```
 
@@ -39,7 +39,7 @@ allprojects {
     }
 }
 dependencies {
-    compile 'com.github.trychen:jLogitow:1.0'
+    compile 'com.github.trychen:jLogitow:1.0-BETA'
 }
 ```
 

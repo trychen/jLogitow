@@ -4,17 +4,17 @@ import java.util.Arrays;
 
 public class BlockData {
     /**
-     * block which is inserted
+     * block which was inserted
      */
     public final int insertBlockID;
 
     /**
-     * the face of block which is inserted
+     * the face of block which was inserted
      */
     public final int insertFace;
 
     /**
-     * insert
+     * new block
      */
     public final int newBlockID;
 

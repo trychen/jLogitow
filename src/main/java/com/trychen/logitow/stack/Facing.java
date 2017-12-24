@@ -1,8 +1,8 @@
 package com.trychen.logitow.stack;
 
 public enum Facing {
-    BACK(1), // 针脚
-    FRONT(2), // 针脚对面
+    BACK(1),
+    FRONT(2),
     UP(3),
     LEFT(4),
     DOWN(5),

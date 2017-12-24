@@ -25,7 +25,4 @@ public enum SystemType {
         }
         return currentSystem;
     }
-    public static String getCurrentSystemVersion() {
-         return System.getProperty("os.version");
-    }
 }

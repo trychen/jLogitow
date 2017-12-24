@@ -1,12 +1,15 @@
 package com.trychen.logitow;
 
-import com.trychen.logitow.jni.DynamicLoader;
+import com.trychen.logitow.jni.NativeUtils;
+import com.trychen.logitow.jni.SystemType;
+import com.trychen.logitow.jni.SystemVersion;
 import com.trychen.logitow.stack.BlockData;
 import com.trychen.logitow.stack.BluetoothState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -14,9 +17,10 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- *
+ * core class
  *
  * @author trychen
+ * @since 1.0
  */
 public final class LogiTowBLEStack {
     private static Logger logger = LogManager.getLogger("Logitow BLE Stack");
@@ -29,23 +33,21 @@ public final class LogiTowBLEStack {
 
     static {
         // start loading library
-        if (DynamicLoader.isCurrentSystemSupport()) {
+        if (SystemVersion.isCurrentSystemSupport()) {
             try {
                 System.loadLibrary("logitow");
                 setup();
                 available = true;
-            } catch (Exception error) {
-                error.printStackTrace();
-            }
-
-            try {
-                DynamicLoader.loadLibrary();
-                setup();
-                available = true;
-            } catch (UnsatisfiedLinkError error) {
-                // fount it unable to found usable native lib for current system
-                System.err.println("Couldn't find a satisfied native logitow lib for current system");
-                error.printStackTrace();
+            } catch (Throwable error) {
+                try {
+                    NativeUtils.loadLibraryFromJar("/logitow." + SystemType.getCurrentSystem().getJniLibSuffix());
+                    setup();
+                    available = true;
+                } catch (UnsatisfiedLinkError|IOException err) {
+                    // fount it unable to found usable native lib for current system
+                    System.err.println("Couldn't find a satisfied native logitow lib for current system");
+                    err.printStackTrace();
+                }
             }
         }
     }
@@ -263,7 +265,7 @@ public final class LogiTowBLEStack {
      * get the percent of rest battery
      */
     public CompletableFuture<Float> getRestBattery() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Getting batter not implemented");
 //        return getVoltage().thenApply((voltage) -> (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
     }
 

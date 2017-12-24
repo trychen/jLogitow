@@ -13,6 +13,37 @@ macOS|10.10|Compile based on OS X 10.11
 Forge|Only 1.12.2|Only required when your and developing with forge
 Windows||Implement soon
 
+### Install
+For Maven, add this in `pom.xml`:
+```xml
+<repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://www.jitpack.io</url>
+	</repository>
+</repositories>
+...
+<dependency>
+    <groupId>com.github.trychen</groupId>
+    <artifactId>jLogitow</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+For Gradle, add this in `build.gradle`:
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://www.jitpack.io' }
+    }
+}
+dependencies {
+    compile 'com.github.trychen:jLogitow:1.0'
+}
+```
+
+
 ### Quick Start
 The following code can automatically connect to Logitow and add print when data recived
 

@@ -236,10 +236,8 @@ public final class LogiTowBLEStack {
             logger.info(blockData.toString());
 
             // notify to the consumers
-            executorService.submit(() -> {
-                for (BLEStackCallback callback : callbacks)
-                    if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
-            });
+            for (BLEStackCallback callback : callbacks)
+                if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
         });
     }
 

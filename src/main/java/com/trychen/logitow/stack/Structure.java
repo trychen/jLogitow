@@ -1,18 +1,25 @@
 package com.trychen.logitow.stack;
 
+/**
+ * @author trychen
+ * @since 1.2
+ * @version 2
+ */
 public class Structure {
     private int blockID;
     private Structure parent;
     private Color color;
     private Facing facing = Facing.UNKNOWN;
 
-    private Structure[] children = new Structure[6];
-    private Structure removedStructure;
+    private Coordinate coordinate;
 
-    public Structure(int blockID, Structure parent, Facing facing) {
+    private Structure[] children = new Structure[6];
+
+    public Structure(int blockID, Structure parent, Facing facing, Coordinate coordinate) {
         this.blockID = blockID;
         this.parent = parent;
         this.facing = facing;
+        this.coordinate = coordinate;
         this.color = Color.getColor(blockID);
     }
 
@@ -34,18 +41,35 @@ public class Structure {
             return true;
         }
 
-        if (blockID == 0) {
-            if (blockData.getFacing() != Facing.UP) return false;
-            addChild(Facing.UP, new Structure(blockData.newBlockID, this, Facing.UP));
-        } else {
-            addChild(blockData.getFacing(), new Structure(blockData.newBlockID, this, blockData.getFacing()));
+        Coordinate newCoordinate;
+        switch(blockData.getFacing()) {
+            case TOP:
+                newCoordinate = coordinate.add(0, 1, 0);
+                break;
+            case BOTTOM:
+                newCoordinate = coordinate.add(0, -1, 0);
+                break;
+            case FRONT:
+                newCoordinate = coordinate.add(1, 0, 0);
+                break;
+            case BACK:
+                newCoordinate = coordinate.add(-1, 0, 0);
+                break;
+            case LEFT:
+                newCoordinate = coordinate.add(0, 0, 1);
+                break;
+            case RIGHT:
+                newCoordinate = coordinate.add(0, 0, -1);
+                break;
+            default:
+                return false;
         }
+        addChild(blockData.getFacing(), new Structure(blockData.newBlockID, this, blockData.getFacing(), newCoordinate));
         return true;
     }
 
     private void removeChild(Facing facing) {
-        removedStructure = getChildren(facing);
-        getChildren()[facing.id - 1] = null;
+        getChildren()[facing.id] = null;
     }
 
     private void clear(){
@@ -57,7 +81,7 @@ public class Structure {
     }
 
     public Structure getChildren(Facing face) {
-        return getChildren()[face.id - 1];
+        return getChildren()[face.id];
     }
 
     public Facing getFacing() {
@@ -66,7 +90,7 @@ public class Structure {
 
     private void addChild(Facing facing, Structure structure){
         if (facing == Facing.UNKNOWN) throw new IllegalArgumentException();
-        children[facing.id - 1] = structure;
+        children[facing.id] = structure;
     }
 
     public Structure getFinalStructure() {
@@ -80,14 +104,6 @@ public class Structure {
 
     public Structure getParent() {
         return parent;
-    }
-
-    public Structure getRemovedStructure() {
-        return removedStructure;
-    }
-
-    public void setRemovedStructure(Structure removedStructure) {
-        this.removedStructure = removedStructure;
     }
 
     /**
@@ -107,13 +123,5 @@ public class Structure {
     @Override
     public int hashCode() {
         return Integer.hashCode(blockID);
-    }
-
-    public Structure copy() {
-        Structure structure = new Structure(blockID, parent, facing);
-        for (int i = 0; i < children.length; i++) {
-            structure.children[i] = children[i].copy();
-        }
-        return structure;
     }
 }

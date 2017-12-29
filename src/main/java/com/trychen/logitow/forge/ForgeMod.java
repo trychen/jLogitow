@@ -24,9 +24,7 @@ public class ForgeMod {
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
         if (!LogiTowBLEStack.isAvailable()) return;
-        LogiTowBLEStack.addConnectedRunnable(() -> MinecraftForge.EVENT_BUS.post(new LogitowConnectedEvent()));
-        LogiTowBLEStack.addBlockDataConsumer(blockData -> MinecraftForge.EVENT_BUS.post(new LogitowBlockDataEvent(blockData)));
-        LogiTowBLEStack.addDisconnectedRunnable(() -> MinecraftForge.EVENT_BUS.post(new LogitowDisconnectedEvent()));
+
     }
 
     @Mod.EventHandler

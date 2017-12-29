@@ -3,18 +3,17 @@ package com.trychen.logitow;
 import com.trychen.logitow.jni.NativeUtils;
 import com.trychen.logitow.jni.SystemType;
 import com.trychen.logitow.jni.SystemVersion;
+import com.trychen.logitow.stack.BLEStackCallback;
 import com.trychen.logitow.stack.BlockData;
 import com.trychen.logitow.stack.BluetoothState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 /**
  * core class
@@ -69,7 +68,20 @@ public final class LogiTowBLEStack {
      * the device's unique uuid.
      * warning: it is not unique in different PC or MAC
      */
-    private static UUID connectedDeviceUUID;
+    private static Set<UUID> connectedDevicesUUID = new HashSet<>();
+
+    /**
+     * callback while received something or ready to do something
+     */
+    private static final List<BLEStackCallback> callbacks = new LinkedList<>();
+
+    public static boolean addCallback(BLEStackCallback callback) {
+        return callbacks.add(callback);
+    }
+
+    public static boolean removeCallback(BLEStackCallback callback) {
+        return callbacks.remove(callback);
+    }
 
     /**
      * start scanning logitow if scan haven't started.
@@ -78,6 +90,10 @@ public final class LogiTowBLEStack {
      */
     public static boolean startScan() {
         if (isScanning) return true;
+
+        for (BLEStackCallback callback : callbacks)
+            if (callback.onStartScan()) return false;
+
         isScanning = true;
         return startScanDevice();
     }
@@ -128,12 +144,6 @@ public final class LogiTowBLEStack {
      */
     public static native void disconnect(boolean scanForOtherDevice);
 
-    private static final List<Runnable> disconnectedRunnables = new LinkedList<>();
-
-    public static void addDisconnectedRunnable(Runnable runnable) {
-        disconnectedRunnables.add(runnable);
-    }
-
     /**
      * This method is use for jni to notify that has disconnected to a logitow device.
      *
@@ -141,32 +151,22 @@ public final class LogiTowBLEStack {
      * <pre>
      *      <code>
      *          jboolean rescan = true; // rescan is param "isScanning"
-     *          jmethodID notify_disconnected_funid = env->GetStaticMethodID(jni_ble_class,"notifyDisconnected","(Z)V");
-     *          env->CallStaticVoidMethod(env, jni_ble_class, notify_disconnected_funid, rescan);
+     *          jmethodID notify_disconnected_funid = env->GetStaticMethodID(jni_ble_class,"notifyDisconnected","(Ljava/lang/String;Z)V");
+     *          env->CallStaticVoidMethod(env, jni_ble_class, notify_disconnected_funid, uuid, rescan);
      *      </code>
      * </pre>
      *
      * @param isScanning true if has started scanning
      */
-    private static void notifyDisconnected(boolean isScanning) {
+    private static void notifyDisconnected(String uuid, boolean isScanning) {
         LogiTowBLEStack.isScanning = isScanning;
         isConnected = false;
 
-        executorService.submit(() -> disconnectedRunnables.forEach(Runnable::run));
+        UUID deviceUUID = UUID.fromString(uuid);
 
-        connectedDeviceUUID = null;
-    }
+        connectedDevicesUUID.remove(deviceUUID);
 
-    /**
-     * all register "connected" listener
-     */
-    private static List<Runnable> connectedRunnables = new ArrayList<>();
-
-    /**
-     * add your "connected" listener
-     */
-    public static void addConnectedRunnable(Runnable runnable) {
-        connectedRunnables.add(runnable);
+        executorService.submit(() -> callbacks.forEach(it -> it.onDisconnected(deviceUUID)));
     }
 
     /**
@@ -175,8 +175,8 @@ public final class LogiTowBLEStack {
      * You can refer to the following to call this method in jni.
      * <pre>
      *      <code>
-     *          jmethodID notify_connected_funid = env->GetStaticMethodID(jni_ble_class,"notifyConnected","()V");
-     *          env->CallStaticVoidMethod(jni_ble_class, notify_connected_funid);
+     *          jmethodID notify_connected_funid = env->GetStaticMethodID(jni_ble_class,"notifyConnected","(Ljava/lang/String;)V");
+     *          env->CallStaticVoidMethod(jni_ble_class, notify_connected_funid, uuid);
      *      </code>
      * </pre>
      */
@@ -184,10 +184,13 @@ public final class LogiTowBLEStack {
         isConnected = true;
         isScanning = false;
 
-        connectedDeviceUUID = UUID.fromString(uuid);
+
+        UUID deviceUUID = UUID.fromString(uuid);
+
+        connectedDevicesUUID.add(deviceUUID);
 
         // submit to the blocked
-        executorService.submit(() -> connectedRunnables.forEach(Runnable::run));
+        executorService.submit(() -> callbacks.forEach(it -> it.onConnected(deviceUUID)));
     }
 
     /**
@@ -201,12 +204,11 @@ public final class LogiTowBLEStack {
      * previous received data, using to ignore the verification data
      */
     private static byte[] previousData;
-    private static List<Consumer<BlockData>> blockdataConsumers = new ArrayList<>();
 
     /**
      * this method is use for jni to send the data received from logitow device
      */
-    private static void notifyBlockData(byte[] data) {
+    private static void notifyBlockData(String uuid, byte[] data) {
         // ignore the verification data
         if (previousData != null && Arrays.equals(data, previousData)) {
             previousData = null;
@@ -216,6 +218,8 @@ public final class LogiTowBLEStack {
 
         // submit to single-thread executor to avoid thread being blocked and handle data in order
         executorService.submit(() -> {
+            UUID deviceUUID = UUID.fromString(uuid);
+
             int insertBlockID = data[2] & 0xFF |
                     (data[1] & 0xFF) << 8 |
                     (data[0] & 0xFF) << 16;
@@ -232,39 +236,36 @@ public final class LogiTowBLEStack {
             logger.info(blockData.toString());
 
             // notify to the consumers
-            blockdataConsumers.forEach(it -> it.accept(blockData));
+            executorService.submit(() -> {
+                for (BLEStackCallback callback : callbacks)
+                    if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
+            });
         });
     }
 
-    public static void addBlockDataConsumer(Consumer<BlockData> consumer) {
-        blockdataConsumers.add(consumer);
-    }
-
-    /**
-     * the device's unique uuid.
-     * warning: it is not unique in different PC or MAC
-     */
-    public static UUID getConnectedDeviceUUID() {
-        return connectedDeviceUUID;
-    }
-
-    private CompletableFuture<Float> voltageFutureCache;
+    private static CompletableFuture<Float> voltageFutureCache;
 
     /**
      * The range of the voltage is from 2.1V to 1.5V.
      * when the voltage is close to 1.5V, it means that ForgeMod may no battery
      */
-    public CompletableFuture<Float> getVoltage(){
-        return voltageFutureCache == null ? (voltageFutureCache = new CompletableFuture<>()) : voltageFutureCache;
+    public static CompletableFuture<Float> getVoltage(){
+        if (voltageFutureCache == null) {
+            voltageFutureCache = new CompletableFuture<>();
+            writeToGetVoltage();
+        }
+        return voltageFutureCache;
     }
 
-    public float getMinVoltage() { return 1.5f; }
-    public float getMaxVoltage() { return 2.1f; }
+    public static native void writeToGetVoltage();
+
+    public static float getMinVoltage() { return 1.5f; }
+    public static float getMaxVoltage() { return 2.1f; }
 
     /**
      * get the percent of rest battery
      */
-    public CompletableFuture<Float> getRestBattery() {
+    public static CompletableFuture<Float> getRestBattery() {
         throw new UnsupportedOperationException("Getting batter not implemented");
 //        return getVoltage().thenApply((voltage) -> (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
     }
@@ -272,7 +273,14 @@ public final class LogiTowBLEStack {
     /**
      * this method is for jni to notify changing the voltage for future
      */
-    public void notifyVoltage(float voltage) {
-        voltageFutureCache.complete(voltage);
+    public static void notifyVoltage(String uuid, float voltage) {
+        if (voltageFutureCache != null) voltageFutureCache.complete(voltage);
+
+        UUID deviceUUID = UUID.fromString(uuid);
+
+        executorService.submit(() -> {
+            for (BLEStackCallback callback : callbacks)
+                if (callback.onVoltageDataReceived(deviceUUID, voltage)) return;
+        });
     }
 }

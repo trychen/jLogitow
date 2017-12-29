@@ -1,12 +1,17 @@
 package com.trychen.logitow.stack;
 
+/**
+ * @author trychen
+ * @since 1.2
+ * @version 2
+ */
 public enum Facing {
-    BACK(1),
-    FRONT(2),
-    UP(3),
-    LEFT(4),
-    DOWN(5),
-    RIGHT(6),
+    TOP(0),
+    BOTTOM(1),
+    LEFT(2),
+    RIGHT(3),
+    FRONT(4),
+    BACK(5),
     UNKNOWN(-1);
 
     public final int id;

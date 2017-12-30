@@ -257,7 +257,7 @@ public final class LogiTowBLEStack {
      * get the percent of rest battery
      */
     public static CompletableFuture<Float> getRestBattery(UUID deviceUUID) {
-        return getVoltage(deviceUUID).thenApply((voltage) -> (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
+        return getVoltage(deviceUUID).thenApply((voltage) -> voltage > getMaxVoltage() ? 1 : (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
     }
 
     /**

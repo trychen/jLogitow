@@ -1,12 +1,16 @@
 package com.trychen.logitow.forge.ui;
 
 import com.trychen.logitow.LogiTowBLEStack;
+import com.trychen.logitow.forge.Utils;
+import com.trychen.logitow.stack.BlockData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.GuiScrollingList;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +27,9 @@ public class GuiLogitow extends GuiScreen{
     private CompletableFuture<Float> futureVoltage;
     private int restBattery = -1;
     private float voltage = -1;
-    private GuiButton disconnect, refresh, refreshBattery;
+    private String lastInsertBlockString;
+    private int lastInsertBlockID;
+    private GuiButton disconnect, refresh, refreshBattery, copyDeviceID, copyNewBlockID;
 
     @Override
     public void initGui() {
@@ -32,8 +38,10 @@ public class GuiLogitow extends GuiScreen{
         buttonList.clear();
         buttonList.add(refresh = new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, "刷新"));
 
-        buttonList.add(disconnect = new GuiButton(2, align + 70, this.height / 4 + this.height / 2, 30, 20, "断开"));
-        buttonList.add(refreshBattery = new GuiButton(3, align, this.height / 4 + this.height / 2, 60, 20, "刷新电量"));
+        buttonList.add(disconnect = new GuiButton(2, align + 110, this.height / 4 + this.height / 2, 30, 20, "断开"));
+        buttonList.add(refreshBattery = new GuiButton(3, align + 60, this.height / 4 + this.height / 2, 50, 20, "刷新电量"));
+        buttonList.add(copyDeviceID = new GuiButton(4, align, this.height / 4 + this.height / 2, 60, 20, "复制设备ID"));
+        buttonList.add(copyNewBlockID = new GuiButton(5, align + 135, this.height / 4 + 45, 40, 20, "复制"));
     }
 
     @Override
@@ -73,8 +81,12 @@ public class GuiLogitow extends GuiScreen{
             }
             this.drawString(this.fontRenderer, restBatteryString, align, this.height / 4 + 30, 16777215);
 
+            this.drawString(this.fontRenderer, lastInsertBlockString != null?lastInsertBlockString:"最新插入的方块:  请插入方块", align, this.height / 4 + 50, 16777215);
+            if (lastInsertBlockString != null) copyNewBlockID.drawButton(this.mc, mouseX, mouseY, partialTicks);
+
             disconnect.drawButton(this.mc, mouseX, mouseY, partialTicks);
             refreshBattery.drawButton(this.mc, mouseX, mouseY, partialTicks);
+            copyDeviceID.drawButton(this.mc, mouseX, mouseY, partialTicks);
         } else {
             this.drawString(this.fontRenderer, "请在左侧选择连接的设备", (width - width / 6 + 100) / 2, (this.height - (this.height / 2 + 10)), 16777215);
         }
@@ -97,13 +109,23 @@ public class GuiLogitow extends GuiScreen{
                     futureVoltage = null;
                     voltage = -1;
                     restBattery = -1;
+                } else if (button.id == 4) {
+                    Utils.setSysClipboardText(currentDevice.toString());
+                } else if (button.id == 5){
+                    Utils.setSysClipboardText(String.valueOf(lastInsertBlockID));
                 }
         }
     }
 
     public void deviceUpdated(){
         deviceList.update();
-        updateScreen();
+    }
+
+    public void lastInsertBlock(BlockData blockData) {
+        if (blockData.newBlockID != 0) {
+            lastInsertBlockString = String.format("最新插入的方块:  %s%d %s", Utils.getMinecraftColorCodeFromBlockColor(blockData.getNewBlockColor()), blockData.newBlockID, Utils.getI18NFromBlockColor(blockData.getNewBlockColor()));
+            lastInsertBlockID = blockData.newBlockID;
+        }
     }
 
     class DeviceList extends GuiScrollingList {
@@ -139,6 +161,11 @@ public class GuiLogitow extends GuiScreen{
             } else {
                 selectedIndex = -1;
                 currentDevice = null;
+                lastInsertBlockString = null;
+                futureVoltage = null;
+                voltage = -1;
+                restBattery = -1;
+                lastInsertBlockID = 0;
             }
             devices = newDevices;
         }

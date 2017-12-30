@@ -61,7 +61,6 @@ public class ForgeMod implements BLEStackCallback {
         if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
             ((GuiLogitow) Minecraft.getMinecraft().currentScreen).deviceUpdated();
         }
-
     }
 
     public static Structure structure = new Structure();
@@ -70,6 +69,9 @@ public class ForgeMod implements BLEStackCallback {
     public boolean onBlockDataReceived(UUID deviceUUID, BlockData blockData) {
         MinecraftForge.EVENT_BUS.post(new LogitowBlockDataEvent(deviceUUID, blockData));
         System.out.println(structure.insert(blockData).getCoordinate());
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
+            ((GuiLogitow) Minecraft.getMinecraft().currentScreen).lastInsertBlock(blockData);
+        }
         return false;
     }
 

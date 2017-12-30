@@ -203,23 +203,22 @@ public final class LogiTowBLEStack {
     /**
      * previous received data, using to ignore the verification data
      */
-    private static byte[] previousData;
+    private static final Map<UUID, byte[]> previousDatas = new HashMap<>();
 
     /**
      * this method is use for jni to send the data received from logitow device
      */
     private static void notifyBlockData(String uuid, byte[] data) {
-        // ignore the verification data
-        if (previousData != null && Arrays.equals(data, previousData)) {
-            previousData = null;
-            return;
-        }
-        previousData = data;
-
         // submit to single-thread executor to avoid thread being blocked and handle data in order
         executorService.submit(() -> {
+            // ignore the verification data
             UUID deviceUUID = UUID.fromString(uuid);
+            byte[] bytes = previousDatas.remove(deviceUUID);
+            if (bytes != null && Arrays.equals(data, bytes)) {
+                return;
+            }
 
+            previousDatas.put(deviceUUID, data);
             int insertBlockID = data[2] & 0xFF |
                     (data[1] & 0xFF) << 8 |
                     (data[0] & 0xFF) << 16;
@@ -234,6 +233,7 @@ public final class LogiTowBLEStack {
 
             // output formatted data
             logger.info(blockData.toString());
+            logger.info("insert face=" + insertFace);
 
             // notify to the consumers
             for (BLEStackCallback callback : callbacks)
@@ -241,21 +241,28 @@ public final class LogiTowBLEStack {
         });
     }
 
-    private static CompletableFuture<Float> voltageFutureCache;
+    private static Map<UUID, CompletableFuture<Float>> voltageFutureCache = new HashMap<>();
 
     /**
      * The range of the voltage is from 2.1V to 1.5V.
      * when the voltage is close to 1.5V, it means that ForgeMod may no battery
+     *
+     * @return null if device haven't connected
      */
-    public static CompletableFuture<Float> getVoltage(){
-        if (voltageFutureCache == null) {
-            voltageFutureCache = new CompletableFuture<>();
-            writeToGetVoltage();
+    public static CompletableFuture<Float> getVoltage(UUID deviceUUID){
+        // device haven't connected
+        if (!connectedDevicesUUID.contains(deviceUUID)) return null;
+
+        CompletableFuture<Float> future = voltageFutureCache.get(deviceUUID);
+        if (future == null) {
+            future = new CompletableFuture<>();
+            voltageFutureCache.put(deviceUUID, future);
+            writeToGetVoltage(deviceUUID.toString());
         }
-        return voltageFutureCache;
+        return future;
     }
 
-    public static native void writeToGetVoltage();
+    public static native boolean writeToGetVoltage(String uuid);
 
     public static float getMinVoltage() { return 1.5f; }
     public static float getMaxVoltage() { return 2.1f; }
@@ -263,22 +270,26 @@ public final class LogiTowBLEStack {
     /**
      * get the percent of rest battery
      */
-    public static CompletableFuture<Float> getRestBattery() {
-        throw new UnsupportedOperationException("Getting batter not implemented");
-//        return getVoltage().thenApply((voltage) -> (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
+    public static CompletableFuture<Float> getRestBattery(UUID deviceUUID) {
+        return getVoltage(deviceUUID).thenApply((voltage) -> (voltage - getMinVoltage()) / (getMaxVoltage() - getMinVoltage()));
     }
 
     /**
      * this method is for jni to notify changing the voltage for future
      */
-    public static void notifyVoltage(String uuid, float voltage) {
-        if (voltageFutureCache != null) voltageFutureCache.complete(voltage);
-
+    public static void notifyVoltage(String uuid, byte[] rawData) {
         UUID deviceUUID = UUID.fromString(uuid);
+
+        int i = rawData[0] & 0xFF;
+        int j = rawData[1] & 0xFF;
+        float voltage = i + j * 0.1f;
 
         executorService.submit(() -> {
             for (BLEStackCallback callback : callbacks)
                 if (callback.onVoltageDataReceived(deviceUUID, voltage)) return;
         });
+
+        CompletableFuture<Float> future = voltageFutureCache.remove(deviceUUID);
+        if (voltageFutureCache != null) future.complete(voltage);
     }
 }

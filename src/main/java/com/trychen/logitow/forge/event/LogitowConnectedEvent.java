@@ -1,6 +1,9 @@
 package com.trychen.logitow.forge.event;
 
-import net.minecraftforge.fml.common.eventhandler.Event;
+import java.util.UUID;
 
-public class LogitowConnectedEvent extends Event {
+public class LogitowConnectedEvent extends LogitowEvent {
+    public LogitowConnectedEvent(UUID deviceUUID) {
+        super(deviceUUID);
+    }
 }

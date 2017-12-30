@@ -51,7 +51,7 @@ public final class LogiTowBLEStack {
         }
     }
 
-    private static boolean isScanning = false, isConnected = false;
+    private static boolean isScanning = false;
 
     private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -139,10 +139,8 @@ public final class LogiTowBLEStack {
 
     /**
      * disconnect device
-     *
-     * @param scanForOtherDevice restart scanning
      */
-    public static native void disconnect(boolean scanForOtherDevice);
+    public static native void disconnect(String device);
 
     /**
      * This method is use for jni to notify that has disconnected to a logitow device.
@@ -160,7 +158,6 @@ public final class LogiTowBLEStack {
      */
     private static void notifyDisconnected(String uuid, boolean isScanning) {
         LogiTowBLEStack.isScanning = isScanning;
-        isConnected = false;
 
         UUID deviceUUID = UUID.fromString(uuid);
 
@@ -181,23 +178,12 @@ public final class LogiTowBLEStack {
      * </pre>
      */
     private static void notifyConnected(String uuid) {
-        isConnected = true;
-        isScanning = false;
-
-
         UUID deviceUUID = UUID.fromString(uuid);
 
         connectedDevicesUUID.add(deviceUUID);
 
         // submit to the blocked
         executorService.submit(() -> callbacks.forEach(it -> it.onConnected(deviceUUID)));
-    }
-
-    /**
-     * if stack has been connected to a logitow device
-     */
-    public static boolean isConnected() {
-        return isConnected;
     }
 
     /**
@@ -291,5 +277,9 @@ public final class LogiTowBLEStack {
 
         CompletableFuture<Float> future = voltageFutureCache.remove(deviceUUID);
         if (voltageFutureCache != null) future.complete(voltage);
+    }
+
+    public static Set<UUID> getConnectedDevicesUUID() {
+        return connectedDevicesUUID;
     }
 }

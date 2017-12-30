@@ -1,5 +1,7 @@
 package com.trychen.logitow.stack;
 
+import java.util.Arrays;
+
 /**
  * @author trychen
  * @since 1.2
@@ -15,6 +17,10 @@ public class Structure {
 
     private Structure[] children = new Structure[6];
 
+    public Structure(){
+        this(0, null, Facing.UNKNOWN, new Coordinate(0, 0, 0));
+    }
+
     public Structure(int blockID, Structure parent, Facing facing, Coordinate coordinate) {
         this.blockID = blockID;
         this.parent = parent;
@@ -27,21 +33,26 @@ public class Structure {
      * 插入方块
      * @param blockData 方块数据
      */
-    public boolean insert(BlockData blockData){
+    public Structure insert(BlockData blockData){
         // 检查是否为当前的方块
         if (blockData.insertBlockID != blockID) {
             for (Structure child : children) {
-                if (child!= null && child.insert(blockData)) return true;
+                if (child == null) continue;
+                Structure structure = child.insert(blockData);
+                if (structure != null) return structure;
             }
-            return false;
+            return null;
         }
         // 检查是否为拆除方块
         if (blockData.newBlockID == 0) {
             removeChild(blockData.getFacing());
-            return true;
+            return null;
         }
 
         Coordinate newCoordinate;
+        if (blockData.insertBlockID == 0) {
+            newCoordinate = coordinate.add(1, 0, 0);
+        } else
         switch(blockData.getFacing()) {
             case TOP:
                 newCoordinate = coordinate.add(0, 1, 0);
@@ -62,10 +73,10 @@ public class Structure {
                 newCoordinate = coordinate.add(0, 0, -1);
                 break;
             default:
-                return false;
+                return null;
         }
-        addChild(blockData.getFacing(), new Structure(blockData.newBlockID, this, blockData.getFacing(), newCoordinate));
-        return true;
+
+        return addChild(blockData.getFacing(), new Structure(blockData.newBlockID, this, blockData.getFacing(), newCoordinate));
     }
 
     private void removeChild(Facing facing) {
@@ -88,14 +99,10 @@ public class Structure {
         return facing;
     }
 
-    private void addChild(Facing facing, Structure structure){
+    private Structure addChild(Facing facing, Structure structure){
         if (facing == Facing.UNKNOWN) throw new IllegalArgumentException();
         children[facing.id] = structure;
-    }
-
-    public Structure getFinalStructure() {
-        if (getParent().getFacing() != getParent().getParent().getFacing()) return this;
-        return getParent().getFinalStructure();
+        return structure;
     }
 
     public Color getColor(){
@@ -104,6 +111,10 @@ public class Structure {
 
     public Structure getParent() {
         return parent;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
     }
 
     /**

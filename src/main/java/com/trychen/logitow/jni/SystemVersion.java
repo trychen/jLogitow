@@ -5,8 +5,6 @@ public interface SystemVersion {
         String currentVersion = getCurrentSystemVersion();
         if (SystemType.getCurrentSystem() == SystemType.MACOSX) {
             return currentVersion.startsWith("10.1");
-        } else if (SystemType.getCurrentSystem() == SystemType.WINDOWS) {
-            return currentVersion.startsWith("10.");
         }
         return false;
     }

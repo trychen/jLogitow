@@ -39,4 +39,9 @@ public class Coordinate implements Cloneable{
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("Coordinate{x=%d, y=%d, z=%d}", x, y, z);
+    }
 }

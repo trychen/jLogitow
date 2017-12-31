@@ -265,10 +265,9 @@ public final class LogiTowBLEStack {
      */
     public static void notifyVoltage(String uuid, byte[] rawData) {
         UUID deviceUUID = UUID.fromString(uuid);
-
         int i = rawData[0] & 0xFF;
         int j = rawData[1] & 0xFF;
-        float voltage = i + j * 0.1f;
+        float voltage = Float.parseFloat(i + "." + j);
 
         executorService.submit(() -> {
             for (BLEStackCallback callback : callbacks)

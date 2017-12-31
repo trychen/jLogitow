@@ -1,0 +1,15 @@
+key.logitow.category=Logitow
+key.logitow.manager.desc=设备管理
+
+manager.title.desc=Logitow 设备管理
+manager.refresh.desc=刷新
+manager.disconnect.desc=断开
+manager.refresh_battery.desc=刷新电量
+manager.copy_device_uuid.desc=复制设备ID
+manager.copy_block_id.desc=复制
+manager.device_uuid.desc=设备标识符：
+manager.rest_battery.desc=剩余电量：
+manager.getting_rest_battery.desc=§3获取中
+manager.choose_device.desc=请在左侧选择连接的设备
+manager.new_block.desc=最新插入的方块：
+manager.no_new_block.desc=最新插入的方块：  请插入方块

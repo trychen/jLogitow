@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.GuiScrollingList;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +35,12 @@ public class GuiLogitow extends GuiScreen{
         int align = (width - width / 6 + 100) / 2 - 50;
         this.deviceList = new DeviceList(this.mc, 80, this.height / 2, this.height / 4, this.height - (this.height / 4), width / 6, 14);
         buttonList.clear();
-        buttonList.add(refresh = new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, "刷新"));
+        buttonList.add(refresh = new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, I18n.format("manager.refresh.desc")));
 
-        buttonList.add(disconnect = new GuiButton(2, align + 110, this.height / 4 + this.height / 2, 30, 20, "断开"));
-        buttonList.add(refreshBattery = new GuiButton(3, align + 60, this.height / 4 + this.height / 2, 50, 20, "刷新电量"));
-        buttonList.add(copyDeviceID = new GuiButton(4, align, this.height / 4 + this.height / 2, 60, 20, "复制设备ID"));
-        buttonList.add(copyNewBlockID = new GuiButton(5, align + 135, this.height / 4 + 45, 40, 20, "复制"));
+        buttonList.add(disconnect = new GuiButton(2, align + 110, this.height / 4 + this.height / 2, 30, 20, I18n.format("manager.disconnect.desc")));
+        buttonList.add(refreshBattery = new GuiButton(3, align + 60, this.height / 4 + this.height / 2, 50, 20, I18n.format("manager.refresh_battery.desc")));
+        buttonList.add(copyDeviceID = new GuiButton(4, align, this.height / 4 + this.height / 2, 60, 20, I18n.format("manager.copy_device_uuid.desc")));
+        buttonList.add(copyNewBlockID = new GuiButton(5, align + 135, this.height / 4 + 45, 40, 20, I18n.format("manager.copy_block_id.desc")));
     }
 
     @Override
@@ -51,12 +50,12 @@ public class GuiLogitow extends GuiScreen{
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        if (mc.world == null)this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, "Logitow 设备管理", this.width / 2, 30, 16777215);
+        this.drawDefaultBackground();
+        this.drawCenteredString(this.fontRenderer, I18n.format("manager.title.desc"), this.width / 2, 30, 16777215);
         this.deviceList.drawScreen(mouseX, mouseY, partialTicks);
         int align = (width - width / 6 + 100) / 2 - 50;
         if (currentDevice != null) {
-            String id = "设备标识符：  " + currentDevice.toString();
+            String id = I18n.format("manager.device_uuid.desc") + "  " + currentDevice.toString().toUpperCase();
             this.drawString(this.fontRenderer, id, align, this.height / 4 + 10, 16777215);
 
             String restBatteryString;
@@ -73,22 +72,22 @@ public class GuiLogitow extends GuiScreen{
                     }
                 }
                 if (restBattery > 20)
-                    restBatteryString = String.format("剩余电量:  §2%d / 100 §r(%.1f)", restBattery, voltage);
+                    restBatteryString = String.format("%s  §2%d / 100 §r(%.2f)", I18n.format("manager.rest_battery.desc"), restBattery, voltage);
                 else
-                    restBatteryString = String.format("剩余电量:  §c%d / 100 §r(%.1f)", restBattery, voltage);
+                    restBatteryString = String.format("%s  §c%d / 100 §r(%.2f)", I18n.format("manager.rest_battery.desc"), restBattery, voltage);
             } else {
-                restBatteryString = "剩余电量:  §3获取中";
+                restBatteryString = I18n.format("manager.rest_battery.desc") + "  " + I18n.format("manager.getting_rest_battery.desc");
             }
             this.drawString(this.fontRenderer, restBatteryString, align, this.height / 4 + 30, 16777215);
 
-            this.drawString(this.fontRenderer, lastInsertBlockString != null?lastInsertBlockString:"最新插入的方块:  请插入方块", align, this.height / 4 + 50, 16777215);
+            this.drawString(this.fontRenderer, lastInsertBlockString != null?lastInsertBlockString:I18n.format("manager.no_new_block.desc"), align, this.height / 4 + 50, 16777215);
             if (lastInsertBlockString != null) copyNewBlockID.drawButton(this.mc, mouseX, mouseY, partialTicks);
 
             disconnect.drawButton(this.mc, mouseX, mouseY, partialTicks);
             refreshBattery.drawButton(this.mc, mouseX, mouseY, partialTicks);
             copyDeviceID.drawButton(this.mc, mouseX, mouseY, partialTicks);
         } else {
-            this.drawString(this.fontRenderer, "请在左侧选择连接的设备", (width - width / 6 + 100) / 2, (this.height - (this.height / 2 + 10)), 16777215);
+            this.drawString(this.fontRenderer, I18n.format("manager.choose_device.desc"), (width - width / 6 + 100) / 2, (this.height - (this.height / 2 + 10)), 16777215);
         }
         refresh.drawButton(this.mc, mouseX, mouseY, partialTicks);
     }
@@ -110,7 +109,7 @@ public class GuiLogitow extends GuiScreen{
                     voltage = -1;
                     restBattery = -1;
                 } else if (button.id == 4) {
-                    Utils.setSysClipboardText(currentDevice.toString());
+                    Utils.setSysClipboardText(currentDevice.toString().toUpperCase());
                 } else if (button.id == 5){
                     Utils.setSysClipboardText(String.valueOf(lastInsertBlockID));
                 }
@@ -123,7 +122,7 @@ public class GuiLogitow extends GuiScreen{
 
     public void lastInsertBlock(BlockData blockData) {
         if (blockData.newBlockID != 0) {
-            lastInsertBlockString = String.format("最新插入的方块:  %s%d %s", Utils.getMinecraftColorCodeFromBlockColor(blockData.getNewBlockColor()), blockData.newBlockID, Utils.getI18NFromBlockColor(blockData.getNewBlockColor()));
+            lastInsertBlockString = String.format("%s  %s%d %s", I18n.format("manager.new_block.desc"), Utils.getMinecraftColorCodeFromBlockColor(blockData.getNewBlockColor()), blockData.newBlockID, Utils.getI18NFromBlockColor(blockData.getNewBlockColor()));
             lastInsertBlockID = blockData.newBlockID;
         }
     }

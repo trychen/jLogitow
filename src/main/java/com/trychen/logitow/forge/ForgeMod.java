@@ -62,13 +62,9 @@ public class ForgeMod implements BLEStackCallback {
         }
     }
 
-    public static final BuildBlock buildBlock = new BuildBlock();
-
     @Override
     public boolean onBlockDataReceived(UUID deviceUUID, BlockData blockData) {
         MinecraftForge.EVENT_BUS.post(new LogitowBlockDataEvent(deviceUUID, blockData));
-
-        System.out.println(buildBlock.connect(blockData));
 
         if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
             ((GuiLogitow) Minecraft.getMinecraft().currentScreen).lastInsertBlock(blockData);

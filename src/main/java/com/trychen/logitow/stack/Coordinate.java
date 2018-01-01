@@ -8,6 +8,10 @@ package com.trychen.logitow.stack;
 public class Coordinate implements Cloneable{
     private int x, y, z;
 
+    public Coordinate() {
+        this(0, 0, 0);
+    }
+
     public Coordinate(int x, int y, int z) {
         this.x = x;
         this.y = y;

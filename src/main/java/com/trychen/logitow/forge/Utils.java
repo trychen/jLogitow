@@ -2,6 +2,7 @@ package com.trychen.logitow.forge;
 
 import com.trychen.logitow.stack.Color;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.EnumDyeColor;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -44,4 +45,59 @@ public interface Utils {
         Transferable tText = new StringSelection(writeMe);
         clip.setContents(tText, null);
     }
+
+    static EnumDyeColor transformToEnumDyeColor(Color color) {
+        switch (color) {
+            case RED:
+                return EnumDyeColor.RED;
+            case BLUE:
+                return EnumDyeColor.BLUE;
+            case YELLOW:
+                return EnumDyeColor.YELLOW;
+            case CYAN:
+                return EnumDyeColor.CYAN;
+            case WHITE:
+                return EnumDyeColor.WHITE;
+            case ORANGE:
+                return EnumDyeColor.ORANGE;
+            case PINK:
+                return EnumDyeColor.PINK;
+            case PURPLE:
+                return EnumDyeColor.PURPLE;
+            case BLACK:
+                return EnumDyeColor.BLACK;
+            case GREEN:
+                return EnumDyeColor.GREEN;
+            default:
+                return EnumDyeColor.WHITE;
+        }
+    }
+
+    static Color transformToColor(EnumDyeColor color) {
+        switch (color) {
+            case RED:
+                return Color.RED;
+            case BLUE:
+                return Color.BLUE;
+            case YELLOW:
+                return Color.YELLOW;
+            case CYAN:
+                return Color.CYAN;
+            case WHITE:
+                return Color.WHITE;
+            case ORANGE:
+                return Color.ORANGE;
+            case PINK:
+                return Color.PINK;
+            case PURPLE:
+                return Color.PURPLE;
+            case BLACK:
+                return Color.BLACK;
+            case GREEN:
+                return Color.GREEN;
+            default:
+                return Color.WHITE;
+        }
+    }
+
 }

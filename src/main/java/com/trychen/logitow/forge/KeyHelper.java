@@ -2,6 +2,7 @@ package com.trychen.logitow.forge;
 
 import com.trychen.logitow.forge.ui.GuiLogitow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,7 +25,7 @@ public enum KeyHelper {
 
     @SubscribeEvent
     public void handleKey(GuiScreenEvent.KeyboardInputEvent e) {
-        if (Keyboard.isKeyDown(keyLogitowDevicesManager.getKeyCode()))  handleManager();
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && Keyboard.isKeyDown(keyLogitowDevicesManager.getKeyCode()))  handleManager();
     }
 
     @SubscribeEvent

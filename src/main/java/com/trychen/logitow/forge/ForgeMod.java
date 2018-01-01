@@ -1,7 +1,6 @@
 package com.trychen.logitow.forge;
 
 import com.trychen.logitow.LogiTowBLEStack;
-import com.trychen.logitow.forge.binding.Binding;
 import com.trychen.logitow.forge.event.LogitowBlockDataEvent;
 import com.trychen.logitow.forge.event.LogitowConnectedEvent;
 import com.trychen.logitow.forge.event.LogitowDisconnectedEvent;
@@ -36,17 +35,11 @@ public class ForgeMod implements BLEStackCallback {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        Binding.INSTANCE.init();
+        KeyHelper.INSTANCE.init();
         if (LogiTowBLEStack.isAvailable()) {
             LogiTowBLEStack.startScan();
         }
     }
-
-    /* ===========================
-     *       Feature Part
-     * ===========================
-     */
-
 
     /* ===========================
      *       BLE Stack Part
@@ -69,15 +62,18 @@ public class ForgeMod implements BLEStackCallback {
         }
     }
 
-    public static final Structure structure = new Structure();
+    public static final BuildBlock buildBlock = new BuildBlock();
 
     @Override
     public boolean onBlockDataReceived(UUID deviceUUID, BlockData blockData) {
         MinecraftForge.EVENT_BUS.post(new LogitowBlockDataEvent(deviceUUID, blockData));
-        System.out.println(structure.insert(blockData).getCoordinate());
+
+        System.out.println(buildBlock.connect(blockData));
+
         if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
             ((GuiLogitow) Minecraft.getMinecraft().currentScreen).lastInsertBlock(blockData);
         }
+
         return false;
     }
 

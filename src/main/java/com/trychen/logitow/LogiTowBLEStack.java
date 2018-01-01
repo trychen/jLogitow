@@ -219,11 +219,13 @@ public final class LogiTowBLEStack {
 
             // output formatted data
             logger.info(blockData.toString());
-            logger.info("insert face=" + insertFace);
 
             // notify to the consumers
-            for (BLEStackCallback callback : callbacks)
+            for (BLEStackCallback callback : callbacks) try {
                 if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         });
     }
 

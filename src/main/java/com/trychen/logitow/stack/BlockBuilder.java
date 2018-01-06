@@ -1,5 +1,6 @@
 package com.trychen.logitow.stack;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,7 +58,9 @@ public class BlockBuilder {
                 }
             }
         } else if (data.newBlockID == 0) {
+            BlockBuilder blockBuilders = childs[findDirIndex(data.insertFace)];
             childs[findDirIndex(data.insertFace)] = null;
+            return blockBuilders;
         } else {
             int dirIndex = findDirIndex(data.insertFace);
             BlockBuilder child = new BlockBuilder(data.newBlockID, this);
@@ -120,5 +123,19 @@ public class BlockBuilder {
     @Override
     public String toString() {
         return String.format("BlockBuilder{id=%d, pos=%s}", blockID, pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new int[]{blockID, parent == null?0:parent.blockID});
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BlockBuilder)) return false;
+        BlockBuilder builder = (BlockBuilder) obj;
+
+        return this.blockID == builder.blockID && this.parent == builder.parent;
     }
 }

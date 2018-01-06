@@ -1,11 +1,8 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "up": "blocks/wool_colored_white",
-    "down": "blocks/wool_colored_gray",
-    "east": "blocks/wool_colored_red",
-    "north": "blocks/wool_colored_blue",
-    "south": "blocks/wool_colored_black",
-    "west": "blocks/wool_colored_green"
+    "all": "logitow:blocks/core_block_side",
+    "north": "logitow:blocks/core_block_pin"
   }
+
 }

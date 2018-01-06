@@ -1,5 +1,14 @@
 {
+  "forge_marker": 1,
+  "defaults": { "model": "logitow:core_block"},
   "variants": {
-    "normal": { "model": "logitow:core_block" }
+    "normal": [{}],
+    "inventory": [{}],
+    "facing=down": { "model": "logitow:core_block" },
+    "facing=north": { "model": "logitow:core_block" },
+    "facing=south": { "model": "logitow:core_block", "y": 180 },
+    "facing=west": { "model": "logitow:core_block", "y": 270 },
+    "facing=east": { "model": "logitow:core_block", "y": 90 },
+    "facing=up": { "model": "logitow:core_block"}
   }
 }

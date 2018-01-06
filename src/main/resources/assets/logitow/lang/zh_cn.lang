@@ -13,3 +13,5 @@ manager.getting_rest_battery.desc=§3获取中
 manager.choose_device.desc=请在左侧选择连接的设备
 manager.new_block.desc=最新插入的方块：
 manager.no_new_block.desc=最新插入的方块：  请插入方块
+
+tile.core_block.name=Logitow 核心块

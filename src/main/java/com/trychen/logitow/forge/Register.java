@@ -22,6 +22,6 @@ public class Register {
     @SubscribeEvent
     public static void registerItem(RegistryEvent.Register<Item> event){
         event.getRegistry().register(itemLogitowCore.setRegistryName(logitowCore.getRegistryName()));
-        ModelLoader.registerItemVariants(itemLogitowCore, new ModelResourceLocation("logitow:" + "core_block", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(itemLogitowCore, 0, new ModelResourceLocation("logitow:" + "core_block", "inventory"));
     }
 }

@@ -1,6 +1,6 @@
 package com.trychen.logitow.forge;
 
-import com.trychen.logitow.LogiTowBLEStack;
+import com.trychen.logitow.LogitowBLEStack;
 import com.trychen.logitow.forge.build.BlockController;
 import com.trychen.logitow.forge.build.GuiCoreBlockSetting;
 import com.trychen.logitow.forge.event.LogitowBlockDataEvent;
@@ -32,15 +32,15 @@ public class ForgeMod implements BLEStackCallback {
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
-        if (!LogiTowBLEStack.isAvailable()) return;
-        LogiTowBLEStack.addCallback(this);
+        if (!LogitowBLEStack.isAvailable()) return;
+        LogitowBLEStack.addCallback(this);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         KeyHelper.INSTANCE.init();
-        if (LogiTowBLEStack.isAvailable()) {
-            LogiTowBLEStack.startScan();
+        if (LogitowBLEStack.isAvailable()) {
+            LogitowBLEStack.startScan();
         }
     }
 
@@ -72,8 +72,8 @@ public class ForgeMod implements BLEStackCallback {
         }
 
         if (BlockController.lastConnectedDevice != null && deviceUUID.equals(BlockController.lastConnectedDevice)){
-            if (LogiTowBLEStack.getConnectedDevicesUUID().size() != 0) {
-                Iterator<UUID> iterable = LogiTowBLEStack.getConnectedDevicesUUID().iterator();
+            if (LogitowBLEStack.getConnectedDevicesUUID().size() != 0) {
+                Iterator<UUID> iterable = LogitowBLEStack.getConnectedDevicesUUID().iterator();
                 BlockController.lastConnectedDevice = iterable.next();
             } else {
                 BlockController.lastConnectedDevice = null;

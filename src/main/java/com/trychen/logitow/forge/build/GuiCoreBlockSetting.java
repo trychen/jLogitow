@@ -1,6 +1,6 @@
 package com.trychen.logitow.forge.build;
 
-import com.trychen.logitow.LogiTowBLEStack;
+import com.trychen.logitow.LogitowBLEStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -54,7 +54,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
 
         DeviceList(Minecraft client, int width, int height, int top, int bottom, int left, int entryHeight) {
             super(client, width, height, top, bottom, left, entryHeight, GuiCoreBlockSetting.this.width, GuiCoreBlockSetting.this.height);
-            devices = new ArrayList<>(LogiTowBLEStack.getConnectedDevicesUUID());
+            devices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
         }
 
         protected boolean isSelected(int index) {
@@ -77,7 +77,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
         }
 
         public void update(){
-            List<UUID> newDevices = new ArrayList<>(LogiTowBLEStack.getConnectedDevicesUUID());
+            List<UUID> newDevices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
             if (selectedIndex != -1 && newDevices.contains(devices.get(selectedIndex - 1))) {
                 selectedIndex = newDevices.indexOf(devices.get(selectedIndex - 1));
             } else {

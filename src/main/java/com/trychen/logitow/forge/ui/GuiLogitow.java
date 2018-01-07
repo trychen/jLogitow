@@ -1,6 +1,6 @@
 package com.trychen.logitow.forge.ui;
 
-import com.trychen.logitow.LogiTowBLEStack;
+import com.trychen.logitow.LogitowBLEStack;
 import com.trychen.logitow.forge.Utils;
 import com.trychen.logitow.stack.BlockData;
 import net.minecraft.client.Minecraft;
@@ -17,8 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.trychen.logitow.LogiTowBLEStack.getMaxVoltage;
-import static com.trychen.logitow.LogiTowBLEStack.getMinVoltage;
+import static com.trychen.logitow.LogitowBLEStack.getMaxVoltage;
+import static com.trychen.logitow.LogitowBLEStack.getMinVoltage;
 
 public class GuiLogitow extends GuiScreen{
     private DeviceList deviceList;
@@ -59,7 +59,7 @@ public class GuiLogitow extends GuiScreen{
             this.drawString(this.fontRenderer, id, align, this.height / 4 + 10, 16777215);
 
             String restBatteryString;
-            if (futureVoltage == null) futureVoltage = LogiTowBLEStack.getVoltage(currentDevice);
+            if (futureVoltage == null) futureVoltage = LogitowBLEStack.getVoltage(currentDevice);
             if (futureVoltage.isDone()) {
                 if (restBattery < 1 || voltage < 1){
                     try {
@@ -99,7 +99,7 @@ public class GuiLogitow extends GuiScreen{
         } else {
             if (currentDevice != null)
                 if (button.id == 2) {
-                        LogiTowBLEStack.disconnect(currentDevice.toString());
+                        LogitowBLEStack.disconnect(currentDevice.toString());
                 } else if (button.id == 3) {
                     futureVoltage = null;
                     voltage = -1;
@@ -129,7 +129,7 @@ public class GuiLogitow extends GuiScreen{
 
         DeviceList(Minecraft client, int width, int height, int top, int bottom, int left, int entryHeight) {
             super(client, width, height, top, bottom, left, entryHeight, GuiLogitow.this.width, GuiLogitow.this.height);
-            devices = new ArrayList<>(LogiTowBLEStack.getConnectedDevicesUUID());
+            devices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
         }
 
         protected boolean isSelected(int index) {
@@ -150,7 +150,7 @@ public class GuiLogitow extends GuiScreen{
         }
 
         public void update(){
-            List<UUID> newDevices = new ArrayList<>(LogiTowBLEStack.getConnectedDevicesUUID());
+            List<UUID> newDevices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
             if (selectedIndex != -1 && newDevices.contains(devices.get(selectedIndex))) {
                 selectedIndex = newDevices.indexOf(devices.get(selectedIndex));
             } else {

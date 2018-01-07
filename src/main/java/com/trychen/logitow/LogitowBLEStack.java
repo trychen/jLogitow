@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
  * @author trychen
  * @since 1.0
  */
-public final class LogiTowBLEStack {
+public final class LogitowBLEStack {
     private static Logger logger = LogManager.getLogger("Logitow BLE Stack");
 
     private static boolean available = false;
@@ -56,7 +56,7 @@ public final class LogiTowBLEStack {
     private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
-     * let native env get the jclass instance of LogiTowBLEStack.class
+     * let native env get the jclass instance of LogitowBLEStack.class
      *
      * Class:     com_trychen_logitow_LogiTowBLEStack
      * Method:    setup
@@ -157,7 +157,7 @@ public final class LogiTowBLEStack {
      * @param isScanning true if has started scanning
      */
     private static void notifyDisconnected(String uuid, boolean isScanning) {
-        LogiTowBLEStack.isScanning = isScanning;
+        LogitowBLEStack.isScanning = isScanning;
 
         UUID deviceUUID = UUID.fromString(uuid);
 

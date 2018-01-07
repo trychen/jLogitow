@@ -30,8 +30,14 @@ public class BlockBuilder {
     // 后  1，0，0
     public static final int[][] pos_offset = {{0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {1, 0, 0}, {0, 0, 1}, {-1, 0, 0}};
 
+    /**
+     * The block's id
+     */
     private int blockID;
 
+    /**
+     * the
+     */
     private Coordinate pos;
 
     private BlockBuilder parent;

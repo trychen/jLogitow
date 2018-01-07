@@ -1,6 +1,8 @@
 package com.trychen.logitow.forge;
 
 import com.trychen.logitow.LogiTowBLEStack;
+import com.trychen.logitow.forge.build.BlockController;
+import com.trychen.logitow.forge.build.GuiCoreBlockSetting;
 import com.trychen.logitow.forge.event.LogitowBlockDataEvent;
 import com.trychen.logitow.forge.event.LogitowConnectedEvent;
 import com.trychen.logitow.forge.event.LogitowDisconnectedEvent;
@@ -13,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -51,14 +54,30 @@ public class ForgeMod implements BLEStackCallback {
         MinecraftForge.EVENT_BUS.post(new LogitowConnectedEvent(deviceUUID));
         if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
             ((GuiLogitow) Minecraft.getMinecraft().currentScreen).deviceUpdated();
+        } else if (Minecraft.getMinecraft().currentScreen instanceof GuiCoreBlockSetting){
+            ((GuiCoreBlockSetting) Minecraft.getMinecraft().currentScreen).deviceUpdated();
         }
+
+        BlockController.lastConnectedDevice = deviceUUID;
     }
 
     @Override
     public void onDisconnected(UUID deviceUUID) {
         MinecraftForge.EVENT_BUS.post(new LogitowDisconnectedEvent(deviceUUID));
+
         if (Minecraft.getMinecraft().currentScreen instanceof GuiLogitow) {
             ((GuiLogitow) Minecraft.getMinecraft().currentScreen).deviceUpdated();
+        } else if (Minecraft.getMinecraft().currentScreen instanceof GuiCoreBlockSetting){
+            ((GuiCoreBlockSetting) Minecraft.getMinecraft().currentScreen).deviceUpdated();
+        }
+
+        if (BlockController.lastConnectedDevice != null && deviceUUID.equals(BlockController.lastConnectedDevice)){
+            if (LogiTowBLEStack.getConnectedDevicesUUID().size() != 0) {
+                Iterator<UUID> iterable = LogiTowBLEStack.getConnectedDevicesUUID().iterator();
+                BlockController.lastConnectedDevice = iterable.next();
+            } else {
+                BlockController.lastConnectedDevice = null;
+            }
         }
     }
 

@@ -5,7 +5,9 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -16,12 +18,17 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * the core block to build
+ */
 public class BlockLogitowCore extends BlockDirectional implements ITileEntityProvider {
     public BlockLogitowCore() {
-        super(Material.IRON);
+        super(Material.CLOTH);
         this.setRegistryName("logitow:core_block");
         this.setUnlocalizedName("core_block");
+
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+
         this.setHardness(2f);
     }
 
@@ -42,6 +49,9 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
         return getDefaultState().withProperty(FACING, placer.getHorizontalFacing());
     }
 
+    /**
+     * creating a block state with PropertyDirection
+     */
     @Override
     @Nonnull
     protected BlockStateContainer createBlockState() {
@@ -57,9 +67,17 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
     @Override
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         super.breakBlock(world, pos, state);
+        // remove TileEntity when block broken
         world.removeTileEntity(pos);
     }
 
+    @Override
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+        if (worldIn.isRemote) {
+            // Open settings gui when click
+            Minecraft.getMinecraft().displayGuiScreen(new GuiCoreBlockSetting((TileEntityLogitowCore) worldIn.getTileEntity(pos)));
+        }
+    }
 
     /**
      * Convert the BlockState into the correct metadata value

@@ -16,3 +16,6 @@ manager.no_new_block.desc=最新插入的方块：  请插入方块
 
 tile.core_block.name=Logitow 构建器
 core_block.setting.title.desc=Logitow 构建器设置
+core_block.setting.enable.desc=状态： §2构建中
+core_block.setting.disable.desc=状态： §1停止构建
+core_block.setting.no_device.desc=状态： §1没有找到设备

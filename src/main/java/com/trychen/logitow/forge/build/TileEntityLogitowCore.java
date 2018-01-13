@@ -17,6 +17,7 @@ public class TileEntityLogitowCore extends TileEntity {
     private boolean enable = true;
     private UUID selectedDevice;
     private boolean mirror = false;
+    private UUID tempDevice;
 
     /**
      * the last built device, to avoid switching in different device.

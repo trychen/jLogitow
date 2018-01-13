@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.GuiScrollingList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,10 @@ public class GuiCoreBlockSetting extends GuiScreen {
     private TileEntityLogitowCore tileEntity;
     private DeviceList deviceList;
     private GuiButton refreshDevices;
+
+    public static final String stateEnabled = I18n.format("core_block.setting.enable.desc");
+    public static final String stateDisabled = I18n.format("core_block.setting.disable.desc");
+    public static final String stateNoDevice = I18n.format("core_block.setting.no_device.desc");
 
     public GuiCoreBlockSetting(TileEntityLogitowCore tileEntity) {
         this.tileEntity = tileEntity;
@@ -28,15 +33,32 @@ public class GuiCoreBlockSetting extends GuiScreen {
             this.deviceList.selectedIndex = this.deviceList.devices.indexOf(tileEntity.getSelectedDevice()) + 1;
         }
         this.buttonList.add(refreshDevices = new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, I18n.format("manager.refresh.desc")));
+
+        int align = (width - width / 6 + 100) / 2 - 50;
+        String state = tileEntity.isEnable()?stateEnabled:stateDisabled;
+        buttonList.add(new GuiButton(2, align, this.height / 4, 200, 20, state));
+        buttonList.add(new GuiButton(3, align, this.height / 4 + 30, 200, 20, "镜像构建:  否"));
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRenderer, I18n.format("core_block.setting.title.desc"), this.width / 2, 30, 16777215);
         this.deviceList.drawScreen(mouseX, mouseY, partialTicks);
-        this.refreshDevices.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        for (GuiButton guiButton : buttonList) {
+            guiButton.drawButton(this.mc, mouseX, mouseY, partialTicks);
+        }
+    }
 
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        if (button.id == 1) {
+            deviceList.update();
+        } else if (button.id == 2) {
+            tileEntity.setEnable(tileEntity.isEnable());
+            button.displayString = tileEntity.isEnable()?stateEnabled:stateDisabled;
+        } else if (button.id == 3) {
+            tileEntity.setMirror(tileEntity.isMirror());
+        }
     }
 
     @Override
@@ -49,7 +71,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
     }
 
     class DeviceList extends GuiScrollingList {
-        int selectedIndex = -1;
+        int selectedIndex = 0;
         List<UUID> devices;
 
         DeviceList(Minecraft client, int width, int height, int top, int bottom, int left, int entryHeight) {
@@ -61,7 +83,9 @@ public class GuiCoreBlockSetting extends GuiScreen {
             return index == selectedIndex;
         }
 
-        @Override protected void drawBackground() { }
+        @Override
+        protected void drawBackground() {
+        }
 
         protected int getSize() {
             return devices.size() + 1;
@@ -76,7 +100,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
             }
         }
 
-        public void update(){
+        public void update() {
             List<UUID> newDevices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
             if (selectedIndex != -1 && newDevices.contains(devices.get(selectedIndex - 1))) {
                 selectedIndex = newDevices.indexOf(devices.get(selectedIndex - 1));
@@ -89,7 +113,8 @@ public class GuiCoreBlockSetting extends GuiScreen {
         protected void drawSlot(int var1, int width, int height, int var4, Tessellator tess) {
             if (var1 == 0)
                 mc.fontRenderer.drawString("Latest", GuiCoreBlockSetting.this.width / 6 + 7, height, 0xFFFFFF);
-            else mc.fontRenderer.drawString("Logitow " + devices.get(var1 - 1).toString().substring(0, 8), GuiCoreBlockSetting.this.width / 6 + 7, height, 0xFFFFFF);
+            else
+                mc.fontRenderer.drawString("Logitow " + devices.get(var1 - 1).toString().substring(0, 8), GuiCoreBlockSetting.this.width / 6 + 7, height, 0xFFFFFF);
         }
     }
 }

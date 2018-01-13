@@ -42,7 +42,7 @@ public final class LogitowBLEStack {
                     NativeUtils.loadLibraryFromJar("/logitow." + SystemType.getCurrentSystem().getJniLibSuffix());
                     setup();
                     available = true;
-                } catch (UnsatisfiedLinkError|IOException err) {
+                } catch (UnsatisfiedLinkError | IOException err) {
                     // fount it unable to found usable native lib for current system
                     System.err.println("Couldn't find a satisfied native logitow lib for current system");
                     err.printStackTrace();
@@ -57,7 +57,7 @@ public final class LogitowBLEStack {
 
     /**
      * let native env get the jclass instance of LogitowBLEStack.class
-     *
+     * <p>
      * Class:     com_trychen_logitow_LogiTowBLEStack
      * Method:    setup
      * Signature: ()V
@@ -144,7 +144,7 @@ public final class LogitowBLEStack {
 
     /**
      * This method is use for jni to notify that has disconnected to a logitow device.
-     *
+     * <p>
      * You can refer to the following to call this method in jni.
      * <pre>
      *      <code>
@@ -168,7 +168,7 @@ public final class LogitowBLEStack {
 
     /**
      * this method is use for jni to notify that has connected to a logitow device
-     *
+     * <p>
      * You can refer to the following to call this method in jni.
      * <pre>
      *      <code>
@@ -221,11 +221,12 @@ public final class LogitowBLEStack {
             logger.info(blockData.toString());
 
             // notify to the consumers
-            for (BLEStackCallback callback : callbacks) try {
-                if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+            for (BLEStackCallback callback : callbacks)
+                try {
+                    if (callback.onBlockDataReceived(deviceUUID, blockData)) return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         });
     }
 
@@ -237,7 +238,7 @@ public final class LogitowBLEStack {
      *
      * @return null if device haven't connected
      */
-    public static CompletableFuture<Float> getVoltage(UUID deviceUUID){
+    public static CompletableFuture<Float> getVoltage(UUID deviceUUID) {
         // device haven't connected
         if (!connectedDevicesUUID.contains(deviceUUID)) return null;
 
@@ -252,8 +253,13 @@ public final class LogitowBLEStack {
 
     public static native boolean writeToGetVoltage(String uuid);
 
-    public static float getMinVoltage() { return 1.5f; }
-    public static float getMaxVoltage() { return 2.1f; }
+    public static float getMinVoltage() {
+        return 1.5f;
+    }
+
+    public static float getMaxVoltage() {
+        return 2.1f;
+    }
 
     /**
      * get the percent of rest battery

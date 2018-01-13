@@ -72,11 +72,9 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
     }
 
     @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
-        if (worldIn.isRemote) {
-            // Open settings gui when click
-            Minecraft.getMinecraft().displayGuiScreen(new GuiCoreBlockSetting((TileEntityLogitowCore) worldIn.getTileEntity(pos)));
-        }
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        Minecraft.getMinecraft().displayGuiScreen(new GuiCoreBlockSetting((TileEntityLogitowCore) worldIn.getTileEntity(pos)));
+        return true;
     }
 
     /**

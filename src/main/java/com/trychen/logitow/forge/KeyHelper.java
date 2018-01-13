@@ -25,7 +25,8 @@ public enum KeyHelper {
 
     @SubscribeEvent
     public void handleKey(GuiScreenEvent.KeyboardInputEvent e) {
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && Keyboard.isKeyDown(keyLogitowDevicesManager.getKeyCode()))  handleManager();
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu && Keyboard.isKeyDown(keyLogitowDevicesManager.getKeyCode()))
+            handleManager();
     }
 
     @SubscribeEvent
@@ -33,7 +34,7 @@ public enum KeyHelper {
         if (keyLogitowDevicesManager.isPressed()) handleManager();
     }
 
-    public void handleManager(){
+    public void handleManager() {
         if (!(Minecraft.getMinecraft().currentScreen instanceof GuiLogitow)) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiLogitow());
         }

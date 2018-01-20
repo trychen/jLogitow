@@ -139,10 +139,11 @@ public class GuiLogitow extends GuiScreen{
         @Override protected void drawBackground() { }
 
         protected int getSize() {
-            return devices.size();
+            return devices.size() + 1;
         }
 
         protected void elementClicked(int index, boolean doubleClick) {
+            if (index == getSize() - 1) return;
             this.selectedIndex = index;
             this.isSelected(selectedIndex);
             GuiLogitow.this.currentDevice = devices.get(selectedIndex);
@@ -165,8 +166,25 @@ public class GuiLogitow extends GuiScreen{
             devices = newDevices;
         }
 
-        protected void drawSlot(int var1, int width, int height, int var4, Tessellator tess) {
-            mc.fontRenderer.drawString("Logitow " + devices.get(var1).toString().substring(0, 8), GuiLogitow.this.width / 6 + 7, height, 0xFFFFFF);
+        protected void drawSlot(int index, int width, int height, int var4, Tessellator tess) {
+            if (index == getSize() - 1) {
+                if (!LogitowBLEStack.isScanning()) return;
+                String s;
+                switch ((int)(Minecraft.getSystemTime() / 300L % 4L)) {
+                    case 0:
+                    default:
+                        s = "O o o";
+                        break;
+                    case 1:
+                    case 3:
+                        s = "o O o";
+                        break;
+                    case 2:
+                        s = "o o O";
+                }
+                mc.fontRenderer.drawString(I18n.format("manager.scaning.desc") + "  " + s, GuiLogitow.this.width / 6 + 13, height, 8421504);
+            } else mc.fontRenderer.drawString("Logitow " + devices.get(index).toString().substring(0, 8), GuiLogitow.this.width / 6 + 7, height, 0xFFFFFF);
+
         }
     }
 }

@@ -96,8 +96,8 @@ public final class LogitowBLEStack {
         for (BLEStackCallback callback : callbacks)
             if (callback.onStartScan()) return false;
 
-        isScanning = true;
-        return startScanDevice();
+        isScanning = startScanDevice();
+        return isScanning;
     }
 
     /**
@@ -292,5 +292,9 @@ public final class LogitowBLEStack {
 
     public static Set<UUID> getConnectedDevicesUUID() {
         return connectedDevicesUUID;
+    }
+
+    public static boolean isScanning() {
+        return isScanning;
     }
 }

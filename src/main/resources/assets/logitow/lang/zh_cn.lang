@@ -8,6 +8,7 @@ logitow.toast.disconnected.subtitle=Logitow-%s
 
 manager.title.desc=Logitow 设备管理
 manager.refresh.desc=刷新
+manager.scaning.desc=搜索中
 manager.disconnect.desc=断开
 manager.refresh_battery.desc=刷新电量
 manager.copy_device_uuid.desc=复制设备ID

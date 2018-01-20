@@ -69,7 +69,11 @@ public class BlockBuilder {
             return blockBuilders;
         } else {
             int dirIndex = findDirIndex(data.insertFace);
+            BlockBuilder childBuilder = childs[dirIndex];
+
+            if (childBuilder != null) return childBuilder;
             BlockBuilder child = new BlockBuilder(data.newBlockID, this);
+
             child.pos = pos.add(pos_offset[dirIndex][0], pos_offset[dirIndex][1], pos_offset[dirIndex][2]);
 
             for (int parentFaceID = 0; parentFaceID < 6; parentFaceID++) {

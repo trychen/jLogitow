@@ -1,11 +1,16 @@
 package com.trychen.logitow.forge.build;
 
 import com.trychen.logitow.LogitowBLEStack;
+import com.trychen.logitow.forge.ForgeMod;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.GuiScrollingList;
 
 import java.io.IOException;
@@ -14,30 +19,37 @@ import java.util.List;
 import java.util.UUID;
 
 public class GuiCoreBlockSetting extends GuiScreen {
-    private TileEntityLogitowCore tileEntity;
+    private IBlockState blockState;
+    private World worldIn;
+    private BlockPos pos;
+    private boolean mirror;
     private DeviceList deviceList;
-    private GuiButton refreshDevices;
 
     public static final String stateEnabled = I18n.format("core_block.setting.enable.desc");
     public static final String stateDisabled = I18n.format("core_block.setting.disable.desc");
-    public static final String stateNoDevice = I18n.format("core_block.setting.no_device.desc");
+    public static final String mirrorEnabled = I18n.format("core_block.setting.mirror.enable.desc");
+    public static final String mirrorDisabled = I18n.format("core_block.setting.mirror.disable.desc");
+//    public static final String stateNoDevice = I18n.format("core_block.setting.no_device.desc");
 
-    public GuiCoreBlockSetting(TileEntityLogitowCore tileEntity) {
-        this.tileEntity = tileEntity;
+    public GuiCoreBlockSetting(World worldIn, BlockPos pos, IBlockState blockState) {
+        this.worldIn = worldIn;
+        this.pos = pos;
+        this.blockState = blockState;
+        mirror = ((TileEntityCoreBlock)worldIn.getTileEntity(pos)).isMirror();
     }
 
     @Override
     public void initGui() {
         this.deviceList = new DeviceList(this.mc, 80, this.height / 2, this.height / 4, this.height - (this.height / 4), width / 6, 14);
-        if (tileEntity.getSelectedDevice() != null) {
-            this.deviceList.selectedIndex = this.deviceList.devices.indexOf(tileEntity.getSelectedDevice()) + 1;
-        }
-        this.buttonList.add(refreshDevices = new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, I18n.format("manager.refresh.desc")));
+//        if (tileEntity.getSelectedDevice() != null) {
+//            this.deviceList.selectedIndex = this.deviceList.devices.indexOf(tileEntity.getSelectedDevice()) + 1;
+//        }
+        this.buttonList.add(new GuiButton(1, width / 6, this.height / 4 + this.height / 2, 80, 20, I18n.format("manager.refresh.desc")));
 
         int align = (width - width / 6 + 100) / 2 - 50;
-        String state = tileEntity.isEnable()?stateEnabled:stateDisabled;
+        String state = blockState.getValue(BlockCore.ENABLED)?stateEnabled:stateDisabled;
         buttonList.add(new GuiButton(2, align, this.height / 4, 200, 20, state));
-        buttonList.add(new GuiButton(3, align, this.height / 4 + 30, 200, 20, "镜像构建:  否"));
+        buttonList.add(new GuiButton(3, align, this.height / 4 + 30, 200, 20, mirror?mirrorEnabled:mirrorDisabled));
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -54,10 +66,16 @@ public class GuiCoreBlockSetting extends GuiScreen {
         if (button.id == 1) {
             deviceList.update();
         } else if (button.id == 2) {
-            tileEntity.setEnable(tileEntity.isEnable());
-            button.displayString = tileEntity.isEnable()?stateEnabled:stateDisabled;
+            boolean now = !blockState.getValue(BlockCore.ENABLED);
+            worldIn.setBlockState(pos, blockState = blockState.withProperty(BlockCore.ENABLED, now));
+//            tileEntity.setEnable(!tileEntity.isEnable());
+//            ForgeMod.getNetwork().sendToServer(new MessageUpdateTileEntity(tileEntity));
+            button.displayString = now?stateEnabled:stateDisabled;
         } else if (button.id == 3) {
-            tileEntity.setMirror(tileEntity.isMirror());
+            ((TileEntityCoreBlock) worldIn.getTileEntity(pos)).setMirror(!mirror);
+            mirror = !mirror;
+//            ForgeMod.getNetwork().sendToServer(new MessageUpdateTileEntity(pos.getX(), pos.getY(), pos.getZ(), MessageUpdateTileEntity.Operate.XMIRROR));
+            button.displayString = mirror?mirrorEnabled:mirrorDisabled;
         }
     }
 
@@ -93,16 +111,16 @@ public class GuiCoreBlockSetting extends GuiScreen {
 
         protected void elementClicked(int index, boolean doubleClick) {
             this.selectedIndex = index;
-            if (selectedIndex == 0) {
-                tileEntity.setSelectedDevice(null);
-            } else {
-                tileEntity.setSelectedDevice(devices.get(selectedIndex - 1));
-            }
+//            if (selectedIndex == 0) {
+//                tileEntity.setSelectedDevice(null);
+//            } else {
+//                tileEntity.setSelectedDevice(devices.get(selectedIndex - 1));
+//            }
         }
 
         public void update() {
             List<UUID> newDevices = new ArrayList<>(LogitowBLEStack.getConnectedDevicesUUID());
-            if (selectedIndex != -1 && newDevices.contains(devices.get(selectedIndex - 1))) {
+            if (selectedIndex > 0 && newDevices.contains(devices.get(selectedIndex - 1))) {
                 selectedIndex = newDevices.indexOf(devices.get(selectedIndex - 1));
             } else {
                 selectedIndex = 0;

@@ -4,11 +4,18 @@
   "variants": {
     "normal": [{}],
     "inventory": [{}],
-    "facing=down": { "model": "logitow:core_block" },
-    "facing=north": { "model": "logitow:core_block" },
-    "facing=south": { "model": "logitow:core_block", "y": 180 },
-    "facing=west": { "model": "logitow:core_block", "y": 270 },
-    "facing=east": { "model": "logitow:core_block", "y": 90 },
-    "facing=up": { "model": "logitow:core_block"}
+    "enabled=true,facing=north": { "model": "logitow:core_block" },
+    "enabled=true,facing=south": { "model": "logitow:core_block", "y": 180 },
+    "enabled=true,facing=west": { "model": "logitow:core_block", "y": 270 },
+    "enabled=true,facing=east": { "model": "logitow:core_block", "y": 90 },
+    "enabled=true,facing=up": { "model": "logitow:core_block", "x": 270},
+    "enabled=true,facing=down": { "model": "logitow:core_block", "x": 90},
+
+    "enabled=false,facing=north": { "model": "logitow:core_block" },
+    "enabled=false,facing=south": { "model": "logitow:core_block", "y": 180 },
+    "enabled=false,facing=west": { "model": "logitow:core_block", "y": 270 },
+    "enabled=false,facing=east": { "model": "logitow:core_block", "y": 90 },
+    "enabled=false,facing=up": { "model": "logitow:core_block", "x": 270},
+    "enabled=false,facing=down": { "model": "logitow:core_block", "x": 90}
   }
 }

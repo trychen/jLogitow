@@ -1,6 +1,6 @@
 package com.trychen.logitow.forge;
 
-import com.trychen.logitow.forge.build.BlockLogitowCore;
+import com.trychen.logitow.forge.build.BlockCore;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class Register {
-    public static final Block logitowCore = new BlockLogitowCore();
+    public static final Block logitowCore = new BlockCore();
     public static final Item itemLogitowCore = new ItemBlock(logitowCore);
 
     @SubscribeEvent

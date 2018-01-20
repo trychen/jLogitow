@@ -3,6 +3,8 @@ package com.trychen.logitow.forge;
 import com.trychen.logitow.LogitowBLEStack;
 import com.trychen.logitow.forge.build.BlockController;
 import com.trychen.logitow.forge.build.GuiCoreBlockSetting;
+import com.trychen.logitow.forge.build.MessageUpdateTileEntity;
+import com.trychen.logitow.forge.build.TileEntityCoreBlock;
 import com.trychen.logitow.forge.event.LogitowBlockDataEvent;
 import com.trychen.logitow.forge.event.LogitowConnectedEvent;
 import com.trychen.logitow.forge.event.LogitowDisconnectedEvent;
@@ -10,10 +12,14 @@ import com.trychen.logitow.forge.event.LogitowVoltageEvent;
 import com.trychen.logitow.forge.ui.GuiLogitow;
 import com.trychen.logitow.stack.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Iterator;
 import java.util.UUID;
@@ -38,10 +44,29 @@ public class ForgeMod implements BLEStackCallback {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        TileEntity.register("logitow:core_block", TileEntityCoreBlock.class);
+        network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+        network.registerMessage(new MessageUpdateTileEntity.MessageHolder(), MessageUpdateTileEntity.class, 0, Side.SERVER);
         KeyHelper.INSTANCE.init();
+
         if (LogitowBLEStack.isAvailable()) {
             LogitowBLEStack.startScan();
         }
+    }
+
+    /* ===========================
+     *          Network
+     * ===========================
+     */
+
+    private static SimpleNetworkWrapper network;
+
+    /**
+     * *
+     * @return shared network wrapper named "pangu"
+     */
+    public static SimpleNetworkWrapper getNetwork() {
+        return network;
     }
 
     /* ===========================

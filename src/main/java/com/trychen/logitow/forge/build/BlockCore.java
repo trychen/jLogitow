@@ -3,6 +3,7 @@ package com.trychen.logitow.forge.build;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -21,13 +22,15 @@ import javax.annotation.Nullable;
 /**
  * the core block to build
  */
-public class BlockLogitowCore extends BlockDirectional implements ITileEntityProvider {
-    public BlockLogitowCore() {
+public class BlockCore extends BlockDirectional implements ITileEntityProvider {
+    public static final PropertyBool ENABLED = PropertyBool.create("enabled");
+
+    public BlockCore() {
         super(Material.CLOTH);
         this.setRegistryName("logitow:core_block");
         this.setUnlocalizedName("core_block");
 
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(ENABLED, true));
 
         this.setHardness(2f);
     }
@@ -46,7 +49,7 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
     @Override
     @Nonnull
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        return getDefaultState().withProperty(FACING, placer.getHorizontalFacing());
+        return this.getDefaultState().withProperty(FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer));
     }
 
     /**
@@ -55,13 +58,13 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
     @Override
     @Nonnull
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING);
+        return new BlockStateContainer(this, FACING, ENABLED);
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return new TileEntityLogitowCore(worldIn);
+        return new TileEntityCoreBlock(worldIn);
     }
 
     @Override
@@ -73,7 +76,7 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiCoreBlockSetting((TileEntityLogitowCore) worldIn.getTileEntity(pos)));
+        Minecraft.getMinecraft().displayGuiScreen(new GuiCoreBlockSetting(worldIn, pos, state));
         return true;
     }
 
@@ -83,8 +86,26 @@ public class BlockLogitowCore extends BlockDirectional implements ITileEntityPro
     @Override
     public int getMetaFromState(IBlockState state) {
         int i = 0;
-        i = i | (state.getValue(FACING)).getIndex();
+        i |= (state.getValue(FACING)).getIndex();
+
+        if (state.getValue(ENABLED)) {
+            i |= 8;
+        }
 
         return i;
     }
+
+    /**
+     * Convert the given metadata into a BlockState for this Block
+     */
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(FACING, getFacing(meta)).withProperty(ENABLED, (meta & 8) > 0);
+    }
+
+    @Nullable
+    public static EnumFacing getFacing(int meta) {
+        int i = meta & 7;
+        return i > 5 ? null : EnumFacing.getFront(i);
+    }
+
 }

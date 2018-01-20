@@ -35,10 +35,12 @@ public final class LogitowBLEStack {
         if (SystemVersion.isCurrentSystemSupport()) {
             try {
                 System.loadLibrary("logitow");
-                setup();
                 available = true;
+                setup();
             } catch (Throwable error) {
-                try {
+                if (available)
+                    error.printStackTrace();
+                else try {
                     NativeUtils.loadLibraryFromJar("/logitow." + SystemType.getCurrentSystem().getJniLibSuffix());
                     setup();
                     available = true;
@@ -200,11 +202,13 @@ public final class LogitowBLEStack {
             // ignore the verification data
             UUID deviceUUID = UUID.fromString(uuid);
             byte[] bytes = previousDatas.remove(deviceUUID);
-            if (bytes != null && Arrays.equals(data, bytes)) {
+
+            if (bytes != null && bytes.length != 0 && Arrays.equals(data, bytes)) {
                 return;
             }
 
             previousDatas.put(deviceUUID, data);
+
             int insertBlockID = data[2] & 0xFF |
                     (data[1] & 0xFF) << 8 |
                     (data[0] & 0xFF) << 16;

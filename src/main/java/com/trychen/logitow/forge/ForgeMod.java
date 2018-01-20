@@ -10,9 +10,14 @@ import com.trychen.logitow.forge.event.LogitowConnectedEvent;
 import com.trychen.logitow.forge.event.LogitowDisconnectedEvent;
 import com.trychen.logitow.forge.event.LogitowVoltageEvent;
 import com.trychen.logitow.forge.ui.GuiLogitow;
+import com.trychen.logitow.forge.ui.LogitowToast;
 import com.trychen.logitow.stack.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.toasts.GuiToast;
+import net.minecraft.client.gui.toasts.IToast;
+import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -82,7 +87,7 @@ public class ForgeMod implements BLEStackCallback {
         } else if (Minecraft.getMinecraft().currentScreen instanceof GuiCoreBlockSetting){
             ((GuiCoreBlockSetting) Minecraft.getMinecraft().currentScreen).deviceUpdated();
         }
-
+        LogitowToast.showConnect(deviceUUID);
         BlockController.lastConnectedDevice = deviceUUID;
     }
 
@@ -95,6 +100,8 @@ public class ForgeMod implements BLEStackCallback {
         } else if (Minecraft.getMinecraft().currentScreen instanceof GuiCoreBlockSetting){
             ((GuiCoreBlockSetting) Minecraft.getMinecraft().currentScreen).deviceUpdated();
         }
+
+        LogitowToast.showDisconnect(deviceUUID);
 
         if (BlockController.lastConnectedDevice != null && deviceUUID.equals(BlockController.lastConnectedDevice)){
             if (LogitowBLEStack.getConnectedDevicesUUID().size() != 0) {

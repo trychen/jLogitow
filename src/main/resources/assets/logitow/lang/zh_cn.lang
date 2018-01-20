@@ -1,6 +1,11 @@
 key.logitow.category=Logitow
 key.logitow.manager.desc=设备管理
 
+logitow.toast.connected.title=成功连接到新设备
+logitow.toast.connected.subtitle=Logitow-%s
+logitow.toast.disconnected.title=设备连接断开， 重新连接失败
+logitow.toast.disconnected.subtitle=Logitow-%s
+
 manager.title.desc=Logitow 设备管理
 manager.refresh.desc=刷新
 manager.disconnect.desc=断开

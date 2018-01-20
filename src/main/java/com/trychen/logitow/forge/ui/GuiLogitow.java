@@ -182,7 +182,7 @@ public class GuiLogitow extends GuiScreen{
                     case 2:
                         s = "o o O";
                 }
-                mc.fontRenderer.drawString(I18n.format("manager.scaning.desc") + "  " + s, GuiLogitow.this.width / 6 + 13, height, 8421504);
+                mc.fontRenderer.drawString(I18n.format("manager.scaning.desc") + "  " + s, GuiLogitow.this.width / 6 + 10, height, 8421504);
             } else mc.fontRenderer.drawString("Logitow " + devices.get(index).toString().substring(0, 8), GuiLogitow.this.width / 6 + 7, height, 0xFFFFFF);
 
         }

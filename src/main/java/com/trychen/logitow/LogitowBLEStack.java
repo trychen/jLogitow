@@ -165,6 +165,10 @@ public final class LogitowBLEStack {
 
         connectedDevicesUUID.remove(deviceUUID);
 
+        // remove voltage future
+        CompletableFuture future = voltageFutureCache.remove(deviceUUID);
+        future.cancel(true);
+
         executorService.submit(() -> callbacks.forEach(it -> it.onDisconnected(deviceUUID)));
     }
 
@@ -182,6 +186,7 @@ public final class LogitowBLEStack {
     private static void notifyConnected(String uuid) {
         UUID deviceUUID = UUID.fromString(uuid);
 
+        // Added to connected device list
         connectedDevicesUUID.add(deviceUUID);
 
         // submit to the blocked

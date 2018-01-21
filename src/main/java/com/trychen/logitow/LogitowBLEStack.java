@@ -167,7 +167,7 @@ public final class LogitowBLEStack {
 
         // remove voltage future
         CompletableFuture future = voltageFutureCache.remove(deviceUUID);
-        future.cancel(true);
+        if (future != null) future.cancel(true);
 
         executorService.submit(() -> callbacks.forEach(it -> it.onDisconnected(deviceUUID)));
     }

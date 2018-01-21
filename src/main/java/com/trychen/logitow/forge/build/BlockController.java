@@ -1,5 +1,6 @@
 package com.trychen.logitow.forge.build;
 
+import com.trychen.logitow.forge.Register;
 import com.trychen.logitow.forge.event.LogitowBlockDataEvent;
 import com.trychen.logitow.stack.BlockBuilder;
 import com.trychen.logitow.stack.Color;
@@ -51,6 +52,9 @@ public class BlockController {
 
                 // check if needed device
                 if (!tileEntityLogitow.checkIfSelectedDevice(event.getDeviceUUID())) continue;
+
+                if (logitowState.getBlock() != Register.logitowCore) continue;
+
                 // check if disabled
                 if (!logitowState.getValue(ENABLED)) continue;
 

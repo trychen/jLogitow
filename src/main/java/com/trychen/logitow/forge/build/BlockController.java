@@ -8,11 +8,13 @@ import com.trychen.logitow.stack.Coordinate;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -24,6 +26,8 @@ import static com.trychen.logitow.forge.build.BlockCore.ENABLED;
 @Mod.EventBusSubscriber
 public class BlockController {
     private static Map<UUID, BlockBuilder> blocks = new HashMap<>();
+    private static Map<UUID, BlockBuilder> removedBlocks = new HashMap<>();
+
     /**
      * the last connected device
      */
@@ -66,21 +70,25 @@ public class BlockController {
                 if (event.getBlockData().newBlockID == 0) {
                     for (BlockBuilder checkingBlock : checkingBlocks) {
                         // get the aim block's pos
-                        BlockPos aim = resolvePos(pos, checkingBlock.getPos(), face, tileEntityLogitow.isMirror());
+                        BlockPos aim = resolvePos(pos, checkingBlock.getPos(), face, tileEntityLogitow.isMirrorX());
 
+                        IBlockState aimState = world.getBlockState(aim);
                         // set block to air when it's wool
-                        if (world.getBlockState(aim).getBlock() == Blocks.WOOL) {
+                        if (aimState.getBlock() == Blocks.WOOL) {
+                            Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(aim, aimState);
                             world.setBlockState(aim, Blocks.AIR.getDefaultState());
                         }
                     }
                 } else {
                     // get the aim block's pos
-                    BlockPos aim = resolvePos(pos, builder.getPos(), face, tileEntityLogitow.isMirror());
+                    BlockPos aim = resolvePos(pos, builder.getPos(), face, tileEntityLogitow.isMirrorX());
                     IBlockState blockState = world.getBlockState(aim);
 
                     // set block to wool block when it's wool, air or grass
                     if (blockState.getBlock() == Blocks.WOOL || blockState.getBlock() == Blocks.AIR || blockState.getBlock() == Blocks.GLASS) {
-                        world.setBlockState(aim, Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, transformToEnumDyeColor(builder.getBlockColor())));
+                        IBlockState newState = Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, transformToEnumDyeColor(builder.getBlockColor()));
+                        world.setBlockState(aim, newState);
+                        Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(aim, newState);
                     }
 
                     // set to disable when end block inserted
@@ -133,5 +141,15 @@ public class BlockController {
             y += relativePos.getZ();
         }
         return absoluteCenterPos.add(x, y, z);
+    }
+
+    @SubscribeEvent
+    public static void blockBreak(BlockEvent.BreakEvent event){
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiCoreBlockSetting){
+            if (event.getPos().equals(((GuiCoreBlockSetting) Minecraft.getMinecraft().currentScreen).getTargetPos())) {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+            }
+        }
+
     }
 }

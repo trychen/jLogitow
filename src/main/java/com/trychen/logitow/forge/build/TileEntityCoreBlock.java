@@ -77,16 +77,32 @@ public class TileEntityCoreBlock extends TileEntity {
         return selectedDevice;
     }
 
-    public boolean isMirror() {
+    public boolean isMirrorX() {
         return mirrorX;
+    }
+
+    public boolean isMirrorY() {
+        return mirrorY;
+    }
+
+    public boolean isMirrorZ() {
+        return mirrorZ;
     }
 
     public void setSelectedDevice(UUID selectedDevice) {
         this.selectedDevice = selectedDevice;
     }
 
-    public void setMirror(boolean mirror) {
-        this.mirrorX = mirror;
+    public void setMirrorX(boolean mirrorX) {
+        this.mirrorX = mirrorX;
+    }
+
+    public void setMirrorY(boolean mirrorY) {
+        this.mirrorY = mirrorY;
+    }
+
+    public void setMirrorZ(boolean mirrorZ) {
+        this.mirrorZ = mirrorZ;
     }
 
     public boolean checkIfSelectedDevice(UUID device) {

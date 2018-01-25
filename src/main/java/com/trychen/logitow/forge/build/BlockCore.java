@@ -67,12 +67,11 @@ public class BlockCore extends BlockDirectional implements ITileEntityProvider {
         return new TileEntityCoreBlock(worldIn);
     }
 
-    @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-        super.breakBlock(world, pos, state);
-        // remove TileEntity when block broken
-        world.removeTileEntity(pos);
-    }
+    //    @Override
+//    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+//        super.breakBlock(world, pos, state);
+//        world.removeTileEntity(pos);
+//    }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {

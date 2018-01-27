@@ -22,7 +22,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
     private IBlockState blockState;
     private World worldIn;
     private BlockPos pos;
-    private boolean mirror;
+    private boolean mirrorX;
     private DeviceList deviceList;
 
     public static final String stateEnabled = I18n.format("core_block.setting.enable.desc");
@@ -35,7 +35,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
         this.worldIn = worldIn;
         this.pos = pos;
         this.blockState = blockState;
-        mirror = ((TileEntityCoreBlock)worldIn.getTileEntity(pos)).isMirror();
+        mirrorX = ((TileEntityCoreBlock) worldIn.getTileEntity(pos)).isMirrorX();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class GuiCoreBlockSetting extends GuiScreen {
         int align = (width - width / 6 + 100) / 2 - 50;
         String state = blockState.getValue(BlockCore.ENABLED)?stateEnabled:stateDisabled;
         buttonList.add(new GuiButton(2, align, this.height / 4, 200, 20, state));
-        buttonList.add(new GuiButton(3, align, this.height / 4 + 30, 200, 20, mirror?mirrorEnabled:mirrorDisabled));
+        buttonList.add(new GuiButton(3, align, this.height / 4 + 30, 200, 20, mirrorX?mirrorEnabled:mirrorDisabled));
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -68,14 +68,12 @@ public class GuiCoreBlockSetting extends GuiScreen {
         } else if (button.id == 2) {
             boolean now = !blockState.getValue(BlockCore.ENABLED);
             worldIn.setBlockState(pos, blockState = blockState.withProperty(BlockCore.ENABLED, now));
-//            tileEntity.setEnable(!tileEntity.isEnable());
-//            ForgeMod.getNetwork().sendToServer(new MessageUpdateTileEntity(tileEntity));
             button.displayString = now?stateEnabled:stateDisabled;
         } else if (button.id == 3) {
-            ((TileEntityCoreBlock) worldIn.getTileEntity(pos)).setMirror(!mirror);
-            mirror = !mirror;
-//            ForgeMod.getNetwork().sendToServer(new MessageUpdateTileEntity(pos.getX(), pos.getY(), pos.getZ(), MessageUpdateTileEntity.Operate.XMIRROR));
-            button.displayString = mirror?mirrorEnabled:mirrorDisabled;
+//            ((TileEntityCoreBlock) worldIn.getTileEntity(pos)).setMirrorX(!mirrorX);
+            mirrorX = !mirrorX;
+            ForgeMod.getNetwork().sendToServer(new MessageUpdateTileEntity(pos.getX(), pos.getY(), pos.getZ(), MessageUpdateTileEntity.Operate.XMIRROR));
+            button.displayString = ((TileEntityCoreBlock) worldIn.getTileEntity(pos)).isMirrorX()?mirrorEnabled:mirrorDisabled;
         }
     }
 
@@ -134,5 +132,9 @@ public class GuiCoreBlockSetting extends GuiScreen {
             else
                 mc.fontRenderer.drawString("Logitow " + devices.get(var1 - 1).toString().substring(0, 8), GuiCoreBlockSetting.this.width / 6 + 7, height, 0xFFFFFF);
         }
+    }
+
+    public BlockPos getTargetPos() {
+        return pos;
     }
 }

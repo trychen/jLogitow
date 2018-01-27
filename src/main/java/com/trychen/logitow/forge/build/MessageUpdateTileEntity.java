@@ -52,9 +52,7 @@ public class MessageUpdateTileEntity implements IMessage {
             TileEntity tileEntity = world.getTileEntity(blockPos);
             if (tileEntity instanceof TileEntityCoreBlock) {
                 if (message.operate == Operate.XMIRROR) {
-                    System.out.println("服务端是否镜像：" + ((TileEntityCoreBlock) tileEntity).isMirror());
-                    ((TileEntityCoreBlock) tileEntity).setMirror(!((TileEntityCoreBlock) tileEntity).isMirror());
-                    System.out.println("服务端是否镜像：" + ((TileEntityCoreBlock) tileEntity).isMirror());
+                    ((TileEntityCoreBlock) tileEntity).setMirrorX(!((TileEntityCoreBlock) tileEntity).isMirrorX());
                 }
 //                tileEntity.markDirty();
             }

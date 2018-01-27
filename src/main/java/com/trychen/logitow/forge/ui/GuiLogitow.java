@@ -95,6 +95,9 @@ public class GuiLogitow extends GuiScreen{
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.id == 1) {
+            if (!LogitowBLEStack.isScanning()) {
+                LogitowBLEStack.startScan();
+            }
             deviceList.update();
         } else {
             if (currentDevice != null)

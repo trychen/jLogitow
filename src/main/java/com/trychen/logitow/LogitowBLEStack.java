@@ -38,6 +38,7 @@ public final class LogitowBLEStack {
                 available = true;
                 setup();
             } catch (Throwable error) {
+                error.printStackTrace();
                 if (available)
                     error.printStackTrace();
                 else try {
@@ -92,6 +93,7 @@ public final class LogitowBLEStack {
      */
     public static boolean startScan() {
         if (isScanning) return true;
+        if (!isAvailable()) return false;
 
         for (BLEStackCallback callback : callbacks)
             if (callback.onStartScan()) return false;
@@ -248,6 +250,7 @@ public final class LogitowBLEStack {
      * @return null if device haven't connected
      */
     public static CompletableFuture<Float> getVoltage(UUID deviceUUID) {
+        if (!isAvailable()) return null;
         // device haven't connected
         if (!connectedDevicesUUID.contains(deviceUUID)) return null;
 
